@@ -1,4 +1,4 @@
-export function FileList() {
+export default function FileList() {
   return (
     <div>
       <div className="flex items-center justify-between">
