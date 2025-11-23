@@ -18,7 +18,9 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button
+          variant="ghost"
+          className="relative h-10 w-10 rounded-full p-0 overflow-hidden">
           {user.picture ? (
             <img
               src={user.picture}
