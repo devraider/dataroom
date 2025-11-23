@@ -5,3 +5,5 @@ export const CONFIG = {
     : 30000,
   MODE: import.meta.env.MODE || "development",
 } as const;
+
+export const isDemoMode = () => CONFIG.MODE === "demo";
