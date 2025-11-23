@@ -1,22 +1,12 @@
-import type { DataRoomFile } from "@/types/file";
-import { Card, CardContent } from "../ui/card";
-
-interface FileCardProps {
-  file: DataRoomFile;
-  onView?: (file: DataRoomFile) => void;
-  onDelete?: (fileId: number) => void;
-  onDownload?: (fileId: number) => void;
-}
-
-export function FileCard({
-  file,
-  onView,
-  onDelete,
-  onDownload,
-}: FileCardProps) {
+export function FileList() {
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-      <CardContent className="p-4">{file.name}</CardContent>
-    </Card>
+    <div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">My Files</h2>
+          <p className="text-muted-foreground">1 file(s)</p>
+        </div>
+      </div>
+    </div>
   );
 }
