@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "name": "Project Proposal.pdf",
+    "mimeType": "application/pdf",
+    "size": 2048576,
+    "createdAt": "2025-11-20T10:00:00.000Z",
+    "modifiedAt": "2025-11-22T10:00:00.000Z",
+    "googleDriveId": "mock_drive_id_1",
+    "webViewLink": "http://localhost:5173/mock/files/sample.pdf"
+  },
+  {
+    "id": 2,
+    "name": "Financial Report Q4 2024.xlsx",
+    "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "size": 524288,
+    "createdAt": "2025-11-19T09:00:00.000Z",
+    "modifiedAt": "2025-11-21T14:30:00.000Z",
+    "googleDriveId": "mock_drive_id_2",
+    "webViewLink": "http://localhost:5173/mock/files/sample.xlsx"
+  },
+  {
+    "id": 3,
+    "name": "Company Logo.png",
+    "mimeType": "image/png",
+    "size": 307200,
+    "createdAt": "2025-11-18T08:00:00.000Z",
+    "modifiedAt": "2025-11-18T08:00:00.000Z",
+    "googleDriveId": "mock_drive_id_3",
+    "thumbnailUrl": "https://picsum.photos/seed/logo/400/300",
+    "webViewLink": "https://drive.google.com/file/d/mock_drive_id_3/view"
+  },
+  {
+    "id": 4,
+    "name": "Take_Home.docx",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "size": 51200,
+    "createdAt": "2025-11-15T16:00:00.000Z",
+    "modifiedAt": "2025-11-20T11:00:00.000Z",
+    "googleDriveId": "mock_drive_id_4",
+    "webViewLink": "http://localhost:5173/mock/files/take_home.docx"
+  }
+]
