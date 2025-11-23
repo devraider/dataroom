@@ -1,6 +1,7 @@
 import type { DataRoomFile } from "@/types/file";
 import { Card, CardContent } from "../ui/card";
 import { formatBytes, formatDate, getFileIcon } from "@/lib/utils";
+import { FileActions } from "./FileActions";
 
 export interface FileCardProps {
   file: DataRoomFile;
@@ -22,6 +23,14 @@ export function FileCard({
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="text-4xl">{fileIcon}</div>
+          <FileActions
+            fileId={file.id}
+            fileName={file.name}
+            webViewLink={file.webViewLink}
+            onView={() => onView?.(file)}
+            onDelete={() => onDelete?.(file.id)}
+            onDownload={() => onDownload?.(file.id)}
+          />
         </div>
 
         <div className="space-y-1">
