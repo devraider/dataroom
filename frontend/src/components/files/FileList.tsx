@@ -3,30 +3,52 @@ import { FileCard } from "./FileCard";
 import { useState } from "react";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 
-const MOCK_FILES = [
+const MOCK_FILES: DataRoomFile[] = [
   {
-    id: "1",
+    id: 1,
     name: "Document.pdf",
-    size: "2.4 MB",
-    uploadedAt: "2024-01-15",
+    size: 2400000,
+    createdAt: new Date("2024-01-15").toISOString(),
+    modifiedAt: new Date("2024-01-16").toISOString(),
+    mimeType: "application/pdf",
+    googleDriveId: "doc-1234-abcd",
+    thumbnailUrl: "https://placehold.co/150",
+    webViewLink: "http://localhost:5173/files/document-pdf",
   },
   {
-    id: "2",
+    id: 2,
     name: "Spreadsheet.xlsx",
-    size: "1.8 MB",
-    uploadedAt: "2024-01-14",
+    size: 1800000,
+    createdAt: new Date("2024-01-14").toISOString(),
+    modifiedAt: new Date("2024-01-15").toISOString(),
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    googleDriveId: "sheet-5678-efgh",
+    thumbnailUrl: "https://placehold.co/150",
+    webViewLink: "http://localhost:5173/files/spreadsheet-xlsx",
   },
   {
-    id: "3",
+    id: 3,
     name: "Presentation.pptx",
-    size: "5.2 MB",
-    uploadedAt: "2024-01-13",
+    size: 5200000,
+    createdAt: new Date("2024-01-13").toISOString(),
+    modifiedAt: new Date("2024-01-14").toISOString(),
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    googleDriveId: "ppt-9012-ijkl",
+    thumbnailUrl: "https://placehold.co/150",
+    webViewLink: "http://localhost:5173/files/presentation-pptx",
   },
   {
-    id: "4",
+    id: 4,
     name: "Image.png",
-    size: "876 KB",
-    uploadedAt: "2024-01-12",
+    size: 876000,
+    createdAt: new Date("2024-01-12").toISOString(),
+    modifiedAt: new Date("2024-01-13").toISOString(),
+    mimeType: "image/png",
+    googleDriveId: "img-3456-mnop",
+    thumbnailUrl: "https://placehold.co/150",
+    webViewLink: "http://localhost:5173/files/image-png",
   },
 ];
 
