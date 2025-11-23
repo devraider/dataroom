@@ -3,6 +3,7 @@ import { FileCard } from "./FileCard";
 import { useState } from "react";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { useFiles } from "@/hooks/useFiles";
+import { EmptyState } from "../common/EmptyState";
 
 const MOCK_FILES: DataRoomFile[] = [
   {
@@ -83,17 +84,24 @@ export default function FileList() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {files.map((file) => (
-          <FileCard
-            key={file.id}
-            file={file}
-            onView={handleView}
-            onDelete={handleDelete}
-            onDownload={handleDownload}
-          />
-        ))}
-      </div>
+      {files.length > 0 ? (
+        files.map((file) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <FileCard
+              key={file.id}
+              file={file}
+              onView={handleView}
+              onDelete={handleDelete}
+              onDownload={handleDownload}
+            />
+          </div>
+        ))
+      ) : (
+        <EmptyState
+          title="No files yet"
+          description="Import files from Google Drive to get started"
+        />
+      )}
     </div>
   );
 }
