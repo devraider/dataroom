@@ -1,4 +1,5 @@
 import type { DataRoomFile } from "@/types/file";
+import { Card, CardContent } from "../ui/card";
 
 export interface FileCardProps {
   file: DataRoomFile;
@@ -13,5 +14,9 @@ export function FileCard({
   onDelete,
   onDownload,
 }: FileCardProps) {
-  return <div>{file.name}</div>;
+  return (
+    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+      <CardContent className="p-4">{file.name}</CardContent>
+    </Card>
+  );
 }
