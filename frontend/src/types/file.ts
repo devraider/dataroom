@@ -1,5 +1,5 @@
 export interface DataRoomFile {
-  id: string;
+  id: number;
   name: string;
   mimeType: string;
   size: number;
