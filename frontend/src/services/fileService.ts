@@ -7,16 +7,16 @@ export const fileService = {
     return data;
   },
 
-  getById: async (id: string): Promise<DataRoomFile> => {
+  getById: async (id: number): Promise<DataRoomFile> => {
     const { data } = await apiClient.get<DataRoomFile>(`/files/${id}`);
     return data;
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/files/${id}`);
   },
 
-  download: async (id: string): Promise<Blob> => {
+  download: async (id: number): Promise<Blob> => {
     const { data } = await apiClient.get<Blob>(`/files/${id}/download`, {
       responseType: "blob",
     });
