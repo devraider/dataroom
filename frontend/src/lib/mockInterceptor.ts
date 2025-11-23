@@ -10,6 +10,59 @@ const mockDataMap: Record<string, string> = {
   "/files/4": "/mock/data/files.json",
 };
 
+// Mock workspaces data
+const mockWorkspaces = [
+  {
+    id: "1",
+    name: "Marketing Team",
+    description: "Marketing materials and campaign files",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ownerId: "1",
+    members: [
+      {
+        id: "1",
+        workspaceId: "1",
+        userId: "1",
+        email: "john.doe@example.com",
+        name: "John Doe",
+        role: "owner",
+        addedAt: new Date().toISOString(),
+        picture:
+          "https://ui-avatars.com/api/?name=Zando+Doe&background=4F46E5&color=fff",
+      },
+    ],
+  },
+  {
+    id: "2",
+    name: "Development",
+    description: "Code documentation and technical resources",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ownerId: "1",
+    members: [
+      {
+        id: "1",
+        workspaceId: "2",
+        userId: "1",
+        email: "john.doe@example.com",
+        name: "John Doe",
+        role: "owner",
+        addedAt: new Date().toISOString(),
+      },
+    ],
+  },
+];
+
+const mockUser = {
+  id: 1,
+  email: "john.doe@example.com",
+  name: "John Doe",
+  role: "admin",
+  picture:
+    "https://ui-avatars.com/api/?name=Zando+Doe&background=4F46E5&color=fff",
+};
+
 export const setupMockInterceptor = (axiosInstance: AxiosInstance) => {
   if (!isDemoMode()) return;
 
@@ -17,6 +70,71 @@ export const setupMockInterceptor = (axiosInstance: AxiosInstance) => {
   axiosInstance.interceptors.request.use(
     async (config) => {
       const url = config.url || "";
+
+      // Mock Google auth
+      if (url.includes("/auth/google")) {
+        config.adapter = () => {
+          return Promise.resolve({
+            data: {
+              user: mockUser,
+              token: "mock-jwt-token-" + Date.now(),
+            },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+          });
+        };
+        return config;
+      }
+
+      // Mock workspaces list
+      if (url === "/workspaces" && config.method === "get") {
+        config.adapter = () => {
+          return Promise.resolve({
+            data: mockWorkspaces,
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+          });
+        };
+        return config;
+      }
+
+      // Mock workspace creation
+      if (url === "/workspaces" && config.method === "post") {
+        const newWorkspace = {
+          id: String(Date.now()),
+          ...config.data,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          ownerId: "1",
+          members: [
+            {
+              id: "1",
+              workspaceId: String(Date.now()),
+              userId: "1",
+              email: mockUser.email,
+              name: mockUser.name,
+              role: "owner",
+              addedAt: new Date().toISOString(),
+              picture: mockUser.picture,
+            },
+          ],
+        };
+        mockWorkspaces.push(newWorkspace);
+        config.adapter = () => {
+          return Promise.resolve({
+            data: newWorkspace,
+            status: 201,
+            statusText: "Created",
+            headers: {},
+            config,
+          });
+        };
+        return config;
+      }
 
       // Check if we have mock data for this endpoint
       const mockPath = Object.keys(mockDataMap).find((key) =>
