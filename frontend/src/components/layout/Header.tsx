@@ -9,7 +9,8 @@ export default function Header() {
     name: "John Doe",
     email: "john.doe@example.com",
     role: UserRole.ADMIN,
-    picture: "https://placehold.co/600x400/png?text=Hello+World",
+    picture:
+      "https://ui-avatars.com/api/?name=John+Doe&background=4F46E5&color=fff",
   };
   const handleLogout = () => {
     // Implement logout functionality here
