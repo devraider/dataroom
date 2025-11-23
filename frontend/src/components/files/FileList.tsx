@@ -2,6 +2,7 @@ import type { DataRoomFile } from "@/types/file";
 import { FileCard } from "./FileCard";
 import { useState } from "react";
 import { LoadingSpinner } from "../common/LoadingSpinner";
+import { useFiles } from "@/hooks/useFiles";
 
 const MOCK_FILES: DataRoomFile[] = [
   {
@@ -52,22 +53,24 @@ const MOCK_FILES: DataRoomFile[] = [
   },
 ];
 
-function handleView(file: DataRoomFile) {
-  console.log("View file:", file);
-}
-
-function handleDelete(fileId: number) {
-  console.log("Delete file:", fileId);
-}
-
-function handleDownload(fileId: number) {
-  console.log("Download file:", fileId);
-}
-
 export default function FileList() {
   const [selectedFile, setSelectedFile] = useState<DataRoomFile | null>(null);
+  const { files, isLoading, deleteFile } = useFiles();
 
-  if (!MOCK_FILES.length) {
+  function handleView(file: DataRoomFile) {
+    console.log("View file:", file);
+  }
+
+  function handleDelete(fileId: number) {
+    if (confirm("Are you sure you want to delete this file?")) {
+      deleteFile(fileId);
+    }
+  }
+
+  function handleDownload(fileId: number) {
+    console.log("Download file:", fileId);
+  }
+  if (isLoading) {
     return <LoadingSpinner text="Loading files..." />;
   }
 
@@ -76,15 +79,15 @@ export default function FileList() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">My Files</h2>
-          <p className="text-muted-foreground">1 file(s)</p>
+          <p className="text-muted-foreground">{files.length} file(s)</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {MOCK_FILES.map((file) => (
+        {files.map((file) => (
           <FileCard
             key={file.id}
-            file={file as any}
+            file={file}
             onView={handleView}
             onDelete={handleDelete}
             onDownload={handleDownload}
