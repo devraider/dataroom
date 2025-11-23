@@ -1,13 +1,11 @@
 import type { DataRoomFile } from "@/types/file";
 import { FileCard } from "./FileCard";
-import { useState } from "react";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { useFiles } from "@/hooks/useFiles";
 import { EmptyState } from "../common/EmptyState";
 import { ImportDialog } from "./ImportDialog";
 
 export default function FileList() {
-  const [selectedFile, setSelectedFile] = useState<DataRoomFile | null>(null);
   const { files, isLoading, deleteFile } = useFiles();
 
   function handleView(file: DataRoomFile) {
