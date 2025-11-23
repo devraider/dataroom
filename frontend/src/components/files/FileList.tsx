@@ -1,6 +1,7 @@
 import type { DataRoomFile } from "@/types/file";
 import { FileCard } from "./FileCard";
 import { useState } from "react";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 const MOCK_FILES = [
   {
@@ -43,6 +44,10 @@ function handleDownload(fileId: number) {
 
 export default function FileList() {
   const [selectedFile, setSelectedFile] = useState<DataRoomFile | null>(null);
+
+  if (!MOCK_FILES.length) {
+    return <LoadingSpinner text="Loading files..." />;
+  }
 
   return (
     <div className="space-y-6">
