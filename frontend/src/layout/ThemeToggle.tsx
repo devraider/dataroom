@@ -5,12 +5,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useThemeStore } from "@/store/themeStore";
 import { Theme } from "@/types/enums";
 import { Laptop, Moon, Sun } from "lucide-react";
-import { useState } from "react";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState(Theme.SYSTEM);
+  const { theme, setTheme } = useThemeStore();
 
   const Icon =
     theme === Theme.LIGHT ? Sun : theme === Theme.DARK ? Moon : Laptop;
