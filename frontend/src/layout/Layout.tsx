@@ -7,10 +7,10 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div>
+    <div className="min-h-screen w-full flex flex-col">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8">{children}</main>
+      <main className="flex-1 w-full px-4 py-8">{children}</main>
     </div>
   );
 }
