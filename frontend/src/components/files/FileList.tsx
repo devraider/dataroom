@@ -34,10 +34,10 @@ export default function FileList() {
           <h2 className="text-2xl font-bold">My Files</h2>
           <p className="text-muted-foreground">{files.length} file(s)</p>
         </div>
-      </div>
 
-      <div className="flex items-center gap-2">
-        <ImportDialog />
+        <div className="flex items-center gap-2">
+          {files.length > 0 && <ImportDialog />}
+        </div>
       </div>
 
       {files.length > 0 ? (
@@ -56,6 +56,7 @@ export default function FileList() {
         <EmptyState
           title="No files yet"
           description="Import files from Google Drive to get started"
+          action={<ImportDialog />}
         />
       )}
     </div>
