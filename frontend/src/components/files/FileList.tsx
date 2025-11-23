@@ -4,6 +4,7 @@ import { useState } from "react";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { useFiles } from "@/hooks/useFiles";
 import { EmptyState } from "../common/EmptyState";
+import { ImportDialog } from "./ImportDialog";
 
 const MOCK_FILES: DataRoomFile[] = [
   {
@@ -82,6 +83,10 @@ export default function FileList() {
           <h2 className="text-2xl font-bold">My Files</h2>
           <p className="text-muted-foreground">{files.length} file(s)</p>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <ImportDialog />
       </div>
 
       {files.length > 0 ? (
