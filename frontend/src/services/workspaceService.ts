@@ -13,7 +13,7 @@ export const workspaceService = {
     return response.data;
   },
 
-  getById: async (id: string): Promise<Workspace> => {
+  getById: async (id: number): Promise<Workspace> => {
     const response = await httpClient.get<Workspace>(`/workspaces/${id}`);
     return response.data;
   },
@@ -23,17 +23,17 @@ export const workspaceService = {
     return response.data;
   },
 
-  update: async (id: string, data: UpdateWorkspace): Promise<Workspace> => {
+  update: async (id: number, data: UpdateWorkspace): Promise<Workspace> => {
     const response = await httpClient.put<Workspace>(`/workspaces/${id}`, data);
     return response.data;
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: number): Promise<void> => {
     await httpClient.delete(`/workspaces/${id}`);
   },
 
   addMember: async (
-    workspaceId: string,
+    workspaceId: number,
     data: AddWorkspaceMember
   ): Promise<AddWorkspaceMember> => {
     const response = await httpClient.post<AddWorkspaceMember>(
@@ -44,15 +44,15 @@ export const workspaceService = {
   },
 
   removeMember: async (
-    workspaceId: string,
-    memberId: string
+    workspaceId: number,
+    memberId: number
   ): Promise<void> => {
     await httpClient.delete(`/workspaces/${workspaceId}/members/${memberId}`);
   },
 
   updateMemberRole: async (
-    workspaceId: string,
-    memberId: string,
+    workspaceId: number,
+    memberId: number,
     role: string
   ): Promise<UpdateWorkspaceMemberRole> => {
     const response = await httpClient.patch<UpdateWorkspaceMemberRole>(
