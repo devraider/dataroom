@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
@@ -42,6 +43,7 @@ export default function WorkspaceActions({
           <Users className="mr-2 h-4 w-4" />
           Manage Members
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => onDelete(workspaceId)}
           className="text-destructive">
