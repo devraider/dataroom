@@ -21,20 +21,26 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-4 w-full">
-        <div className="flex items-center gap-2">
-          <Folder className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold">Data Room</h1>
-        </div>
+        <div className="flex items-center gap-4">
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => navigate("/workspaces")}>
+            <Folder className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">Data Room</h1>
+          </div>
 
-        {isInWorkspace && (
-          <>
-            <div className="h-6 w-px bg-border" />
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Workspace:</span>
-              <span className="font-medium">{currentWorkspace?.name}</span>
-            </div>
-          </>
-        )}
+          {isInWorkspace && currentWorkspace && (
+            <>
+              <div className="h-6 w-px bg-border" />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Workspace:
+                </span>
+                <span className="font-medium">{currentWorkspace.name}</span>
+              </div>
+            </>
+          )}
+        </div>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
