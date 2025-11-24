@@ -9,6 +9,7 @@ import {
 } from "../ui/card";
 import { useState } from "react";
 import WorkspaceActions from "./WorkspaceActions";
+import EditWorkspaceDialog from "./UpdateWrokspaceDialog";
 
 interface WorkspaceCardProps {
   workspace: Workspace;
@@ -62,6 +63,12 @@ export default function WorkspaceCard({
             </span>
           </div>
         </CardContent>
+
+        <EditWorkspaceDialog
+          workspace={workspace}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+        />
       </Card>
     </>
   );
