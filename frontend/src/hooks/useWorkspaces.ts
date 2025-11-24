@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { workspaceService } from "@/services/workspaceService";
 import { QUERY_KEYS } from "@/lib/queryKeys";
-import type { UpdateWorkspace } from "@/types/workspace";
+import type { UpdateWorkspace, AddWorkspaceMember } from "@/types/workspace";
 import { toast } from "sonner";
+import type { UserRole } from "@/types/auth";
 
 export const useWorkspaces = () => {
   const queryClient = useQueryClient();
@@ -62,6 +63,71 @@ export const useWorkspaces = () => {
     },
   });
 
+  const addMemberMutation = useMutation({
+    mutationFn: ({
+      workspaceId,
+      data,
+    }: {
+      workspaceId: number;
+      data: AddWorkspaceMember;
+    }) => workspaceService.addMember(workspaceId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.workspaces.all });
+      toast.success("Member added", {
+        description: "New member has been added to the workspace.",
+      });
+    },
+    onError: (error: any) => {
+      toast.error("Failed to add member", {
+        description: error.response?.data?.message || "Could not add member",
+      });
+    },
+  });
+
+  const removeMemberMutation = useMutation({
+    mutationFn: ({
+      workspaceId,
+      memberId,
+    }: {
+      workspaceId: number;
+      memberId: number;
+    }) => workspaceService.removeMember(workspaceId, memberId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.workspaces.all });
+      toast.success("Member removed", {
+        description: "Member has been removed from the workspace.",
+      });
+    },
+    onError: (error: any) => {
+      toast.error("Failed to remove member", {
+        description: error.response?.data?.message || "Could not remove member",
+      });
+    },
+  });
+
+  const updateMemberRoleMutation = useMutation({
+    mutationFn: ({
+      workspaceId,
+      memberId,
+      role,
+    }: {
+      workspaceId: number;
+      memberId: number;
+      role: UserRole;
+    }) => workspaceService.updateMemberRole(workspaceId, memberId, role),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.workspaces.all });
+      toast.success("Role updated", {
+        description: "Member role has been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast.error("Failed to update role", {
+        description: error.response?.data?.message || "Could not update role",
+      });
+    },
+  });
+
   return {
     workspaces: workspacesQuery.data ?? [],
     isLoading: workspacesQuery.isLoading,
@@ -80,6 +146,18 @@ export const useWorkspaces = () => {
     deleteWorkspace: deleteMutation.mutate,
     isDeleting: deleteMutation.isPending,
     deleteError: deleteMutation.error,
+
+    addMember: addMemberMutation.mutate,
+    isAddingMember: addMemberMutation.isPending,
+    addMemberError: addMemberMutation.error,
+
+    removeMember: removeMemberMutation.mutate,
+    isRemovingMember: removeMemberMutation.isPending,
+    removeMemberError: removeMemberMutation.error,
+
+    updateMemberRole: updateMemberRoleMutation.mutate,
+    isUpdatingMemberRole: updateMemberRoleMutation.isPending,
+    updateMemberRoleError: updateMemberRoleMutation.error,
   };
 };
 
