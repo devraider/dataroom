@@ -8,7 +8,9 @@ import { useParams } from "react-router-dom";
 
 export default function FileList() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
-  const { files, isLoading, deleteFile } = useFiles(workspaceId!);
+  const { files, isLoading, deleteFile } = useFiles(
+    workspaceId ? Number(workspaceId) : 0
+  );
 
   function handleView(file: DataRoomFile) {
     console.log("View file:", file);
