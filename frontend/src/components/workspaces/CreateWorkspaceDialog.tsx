@@ -11,6 +11,8 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
+import { useWorkspaces } from "@/hooks/useWorkspaces";
+import { useAuthStore } from "@/store/authStore";
 
 interface CreateWorkspaceDialogProps {
   open: boolean;
@@ -23,6 +25,17 @@ export default function CreateWorkspaceDialog({
 }: CreateWorkspaceDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const user = useAuthStore((state) => state.user);
+
+  const { createWorkspace, isCreating } = useWorkspaces();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await createWorkspace({ owner: user?.id!, name, description });
+    setName("");
+    setDescription("");
+    onOpenChange(false);
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -64,8 +77,8 @@ export default function CreateWorkspaceDialog({
               onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? "Creating..." : "Create Workspace"}
+            <Button type="submit" disabled={isCreating}>
+              {isCreating ? "Creating..." : "Create Workspace"}
             </Button>
           </DialogFooter>
         </form>
