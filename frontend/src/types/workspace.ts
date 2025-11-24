@@ -1,4 +1,4 @@
-import type { User } from "./auth";
+import type { User, UserRole } from "./auth";
 
 export interface Workspace {
   id: number;
@@ -8,4 +8,14 @@ export interface Workspace {
   updatedAt: string;
   ownerId: number;
   members: User[];
+}
+
+export interface ActionAddWorkspaceMember {
+  email: string;
+  role: UserRole;
+}
+
+export interface ActionUpdateWorkspace {
+  name?: string;
+  description?: string;
 }
