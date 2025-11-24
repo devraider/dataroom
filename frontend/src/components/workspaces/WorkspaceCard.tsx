@@ -1,11 +1,4 @@
-import {
-  Folder,
-  Users,
-  MoreVertical,
-  Trash2,
-  Edit,
-  FolderOpen,
-} from "lucide-react";
+import { Folder, Users } from "lucide-react";
 import type { Workspace } from "../../types/workspace";
 import {
   Card,
@@ -14,14 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
 import { useState } from "react";
+import WorkspaceActions from "./WorkspaceActions";
 
 interface WorkspaceCardProps {
   workspace: Workspace;
@@ -55,33 +42,13 @@ export default function WorkspaceCard({
                 </CardDescription>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onOpen(workspace.id)}>
-                  <FolderOpen className="mr-2 h-4 w-4" />
-                  Open Workspace
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsMembersDialogOpen(true)}>
-                  <Users className="mr-2 h-4 w-4" />
-                  Manage Members
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onDelete(workspace.id)}
-                  className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <WorkspaceActions
+              workspaceId={workspace.id}
+              onOpen={onOpen}
+              onEdit={() => setIsEditDialogOpen(true)}
+              onManageMembers={() => setIsMembersDialogOpen(true)}
+              onDelete={onDelete}
+            />
           </div>
         </CardHeader>
         <CardContent onClick={() => onOpen(workspace.id)}>
