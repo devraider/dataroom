@@ -13,7 +13,7 @@ export interface Workspace {
 export interface CreateWorkspace {
   name: string;
   description?: string;
-  owner: string;
+  owner: number;
 }
 export interface UpdateWorkspace {
   name?: string;
