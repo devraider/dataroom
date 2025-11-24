@@ -8,6 +8,7 @@ from backend.src.types.roles import RoleEnum
 
 if TYPE_CHECKING:
     from backend.src.models.file import File
+    from backend.src.models.user import User
 
 
 class WorkspaceBase(SQLModel):
