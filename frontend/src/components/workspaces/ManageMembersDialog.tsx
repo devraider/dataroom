@@ -19,9 +19,7 @@ import {
 } from "../ui/select";
 import { useState } from "react";
 import { UserRole } from "@/types/auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { workspaceService } from "@/services/workspaceService";
-import { QUERY_KEYS } from "@/lib/queryKeys";
+import { useWorkspaces } from "@/hooks/useWorkspaces";
 import { toast } from "sonner";
 
 interface ManageMembersDialogProps {
@@ -35,27 +33,9 @@ export default function ManageMembersDialog({
   open,
   onOpenChange,
 }: ManageMembersDialogProps) {
-  const queryClient = useQueryClient();
+  const { addMember, isAddingMember } = useWorkspaces();
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<UserRole>(UserRole.READER);
-
-  const addMemberMutation = useMutation({
-    mutationFn: (data: { email: string; role: UserRole }) =>
-      workspaceService.addMember(workspace.id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.workspaces.all });
-      toast.success("Member added", {
-        description: "New member has been added to the workspace.",
-      });
-      setNewMemberEmail("");
-      setNewMemberRole(UserRole.READER);
-    },
-    onError: (error: any) => {
-      toast.error("Failed to add member", {
-        description: error.response?.data?.message || "Could not add member",
-      });
-    },
-  });
 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +45,21 @@ export default function ManageMembersDialog({
       });
       return;
     }
-    addMemberMutation.mutate({
-      email: newMemberEmail,
-      role: newMemberRole,
-    });
+    addMember(
+      {
+        workspaceId: workspace.id,
+        data: {
+          email: newMemberEmail,
+          role: newMemberRole,
+        },
+      },
+      {
+        onSuccess: () => {
+          setNewMemberEmail("");
+          setNewMemberRole(UserRole.READER);
+        },
+      }
+    );
   };
 
   return (
@@ -108,12 +99,9 @@ export default function ManageMembersDialog({
               </SelectContent>
             </Select>
           </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={addMemberMutation.isPending}>
+          <Button type="submit" className="w-full" disabled={isAddingMember}>
             <UserPlus className="mr-2 h-4 w-4" />
-            {addMemberMutation.isPending ? "Adding..." : "Add Member"}
+            {isAddingMember ? "Adding..." : "Add Member"}
           </Button>
         </form>
       </DialogContent>
