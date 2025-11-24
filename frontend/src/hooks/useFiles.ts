@@ -2,24 +2,25 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fileService } from "@/services/fileService";
 import { QUERY_KEYS } from "@/lib/queryKeys";
 
-export const useFiles = () => {
+export const useFiles = (workspaceId: number) => {
   const queryClient = useQueryClient();
 
   const filesQuery = useQuery({
     queryKey: QUERY_KEYS.files.all,
-    queryFn: fileService.getAll,
+    queryFn: () => fileService.getAll(workspaceId),
     staleTime: 30000,
+    enabled: !!workspaceId,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: fileService.delete,
+    mutationFn: (fileId: number) => fileService.delete(workspaceId, fileId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.files.all });
     },
   });
 
   const downloadMutation = useMutation({
-    mutationFn: fileService.download,
+    mutationFn: (fileId: number) => fileService.download(workspaceId, fileId),
   });
 
   return {
@@ -38,11 +39,11 @@ export const useFiles = () => {
   };
 };
 
-export const useFile = (id: number) => {
+export const useFile = (workspaceId: number, id: number) => {
   const fileQuery = useQuery({
     queryKey: QUERY_KEYS.files.detail(id),
-    queryFn: () => fileService.getById(id),
-    enabled: !!id,
+    queryFn: () => fileService.getById(workspaceId, id),
+    enabled: !!id && !!workspaceId,
     staleTime: 30000,
   });
 
