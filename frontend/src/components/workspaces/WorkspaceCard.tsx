@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import WorkspaceActions from "./WorkspaceActions";
 import EditWorkspaceDialog from "./UpdateWrokspaceDialog";
+import ManageMembersDialog from "./ManageMembersDialog";
 
 interface WorkspaceCardProps {
   workspace: Workspace;
@@ -68,6 +69,12 @@ export default function WorkspaceCard({
           workspace={workspace}
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
+        />
+
+        <ManageMembersDialog
+          workspace={workspace}
+          open={isMembersDialogOpen}
+          onOpenChange={setIsMembersDialogOpen}
         />
       </Card>
     </>
