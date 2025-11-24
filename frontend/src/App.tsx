@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { Toaster } from "./components/ui/sonner";
 import DemoLoginPage from "./components/layout/DemoLoginPage";
 import { isDemoMode } from "./lib/config";
+import LoginPage from "./components/layout/LoginPage";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
       <Routes>
         <Route
           path="/login"
-          element={isDemoMode() ? <DemoLoginPage /> : null}
+          element={isDemoMode() ? <DemoLoginPage /> : <LoginPage />}
         />
         <Route element={<ProtectedRoute />}>
           <Route
