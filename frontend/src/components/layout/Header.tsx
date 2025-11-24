@@ -2,12 +2,15 @@ import { Folder } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import UserMenu from "./UserMenu";
 import { useAuthStore } from "@/store/authStore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isInWorkspace = location.pathname.includes("/files");
+  const { workspaceId } = useParams<{ workspaceId: string }>();
 
   const handleLogout = () => {
     logout();
@@ -21,6 +24,16 @@ export default function Header() {
           <Folder className="h-6 w-6 text-primary" />
           <h1 className="text-xl font-bold">Data Room</h1>
         </div>
+
+        {isInWorkspace && (
+          <>
+            <div className="h-6 w-px bg-border" />
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Workspace:</span>
+              <span className="font-medium">{workspaceId}</span>
+            </div>
+          </>
+        )}
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
