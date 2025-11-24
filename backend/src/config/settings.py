@@ -15,7 +15,7 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def db_url(self) -> str:
-        return f"postgresql+psycopg2://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}"
+        return f"postgresql+psycopg2://{self.USER}:{self.PASSWORD.get_secret_value()}@{self.HOST}:{self.PORT}/{self.DATABASE}"
 
 
 class AppSettings(BaseSettings):
