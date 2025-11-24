@@ -1,2 +1,7 @@
 .dev
 .idea
+coverage
+node_modules
+dist
+.vscode
+.env
