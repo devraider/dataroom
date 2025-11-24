@@ -23,6 +23,9 @@ class Workspace(WorkspaceBase, table=True):
     updated_at: datetime = Field(default_factory=utc_now)
     created_by: int = Field(foreign_key="users.id")
 
+    members: list["WorkspaceMember"] = Relationship(back_populates="workspace")
+
+
 
 class WorkspaceMemberBase(SQLModel):
     """Base workspace member model"""
