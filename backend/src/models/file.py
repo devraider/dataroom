@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from backend.src.models.workspace import Workspace
 from backend.src.types.date import utc_now
 
 if TYPE_CHECKING:
@@ -30,4 +29,4 @@ class File(FileBase, table=True):
     updated_at: datetime = Field(default_factory=utc_now)
 
     # Relationships
-    workspace: Workspace = Relationship(back_populates="files")
+    workspace: "Workspace" = Relationship(back_populates="files")
