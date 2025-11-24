@@ -1,11 +1,13 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from backend.src.models.user import User
 from backend.src.types.date import utc_now
 from backend.src.types.roles import RoleEnum
+
+if TYPE_CHECKING:
+    from backend.src.models.file import File
 
 
 class WorkspaceBase(SQLModel):
@@ -25,6 +27,7 @@ class Workspace(WorkspaceBase, table=True):
 
     # Relationships
     members: list["WorkspaceMember"] = Relationship(back_populates="workspace")
+    files: list["File"] = Relationship(back_populates="workspace")
 
 
 
@@ -40,8 +43,8 @@ class WorkspaceMember(WorkspaceMemberBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
     workspace_id: int = Field(foreign_key="workspaces.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
     # Relationships
-    user: User = Relationship(back_populates="workspaces")
+    user: "User" = Relationship(back_populates="workspaces")
     workspace: Workspace = Relationship(back_populates="members")
