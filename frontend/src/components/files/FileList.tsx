@@ -4,9 +4,11 @@ import { LoadingSpinner } from "../common/LoadingSpinner";
 import { useFiles } from "@/hooks/useFiles";
 import { EmptyState } from "../common/EmptyState";
 import { ImportDialog } from "./ImportDialog";
+import { useParams } from "react-router-dom";
 
 export default function FileList() {
-  const { files, isLoading, deleteFile } = useFiles();
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+  const { files, isLoading, deleteFile } = useFiles(workspaceId!);
 
   function handleView(file: DataRoomFile) {
     console.log("View file:", file);
