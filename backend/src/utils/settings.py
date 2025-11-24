@@ -1,20 +1,21 @@
-from pydantic_settings import BaseSettings
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
+class DatabaseSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="POSTGRES_",
+        case_sensitive=True,
+    )
+    USER: str
+    PASSWORD: SecretStr
     HOST: str
+    DATABASE: str
     PORT: int
-    DATABASE_URL: str
-    DATABASE_HOST: str
-    DATABASE_USER: str
-    DATABASE_PASSWORD: str
-    DATABASE_PORT: int
-    DEBUG: bool = False
 
-    class Config:
-        env_file = ".env"
+    @property
+    def url(self) -> str:
+        return f"postgresql+psycopg2://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}"
 
 
-
-
-settings = Settings()
+database_settings = DatabaseSettings()
