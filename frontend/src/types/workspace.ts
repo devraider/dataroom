@@ -23,3 +23,9 @@ export interface AddWorkspaceMember {
   email: string;
   role: UserRole;
 }
+
+export interface UpdateWorkspaceMemberRole {
+  workspaceId: number;
+  userId: number;
+  role: UserRole;
+}
