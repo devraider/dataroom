@@ -3,4 +3,8 @@ export const QUERY_KEYS = {
     all: ["files"],
     detail: (id: number) => ["files", id],
   },
+  workspaces: {
+    all: ["workspaces"],
+    detail: (id: number) => ["workspaces", id],
+  },
 };
