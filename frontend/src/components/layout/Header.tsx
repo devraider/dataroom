@@ -1,20 +1,19 @@
-import { Folder, User } from "lucide-react";
+import { Folder } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import UserMenu from "./UserMenu";
-import { UserRole } from "@/types/auth";
+import { useAuthStore } from "@/store/authStore";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const user = {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: UserRole.ADMIN,
-    picture:
-      "https://ui-avatars.com/api/?name=John+Doe&background=4F46E5&color=fff",
-  };
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    // Implement logout functionality here
+    logout();
+    navigate("/login");
   };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-4 w-full">
@@ -25,7 +24,7 @@ export default function Header() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <UserMenu user={user} onLogout={handleLogout} />
+          {user && <UserMenu user={user} onLogout={handleLogout} />}
         </div>
       </div>
     </header>
