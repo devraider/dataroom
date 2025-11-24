@@ -1,6 +1,4 @@
-import { workspaceService } from "@/services/workspaceService";
 import { useWorkspaceStore } from "@/store/workspaceStore";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Layout from "../layout/Layout";
 import { LoadingSpinner } from "../common/LoadingSpinner";
@@ -9,19 +7,16 @@ import { Plus } from "lucide-react";
 import { EmptyState } from "../common/EmptyState";
 import WorkspaceCard from "./WorkspaceCard";
 import { useState } from "react";
+import { useWorkspaces } from "@/hooks/useWorkspaces";
 
 export default function WorkspaceList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const setCurrentWorkspace = useWorkspaceStore(
     (state) => state.setCurrentWorkspace
   );
 
-  const { data: workspaces, isLoading } = useQuery({
-    queryKey: ["workspaces"],
-    queryFn: workspaceService.getAll,
-  });
+  const { workspaces, isLoading, deleteWorkspace } = useWorkspaces();
 
   const handleOpenWorkspace = (workspaceId: number) => {
     const workspace = workspaces?.find((w) => w.id === workspaceId);
@@ -33,7 +28,7 @@ export default function WorkspaceList() {
 
   const handleDeleteWorkspace = (workspaceId: number) => {
     if (confirm("Are you sure you want to delete this workspace?")) {
-      deleteMutation.mutate(workspaceId);
+      deleteWorkspace(workspaceId);
     }
   };
 
