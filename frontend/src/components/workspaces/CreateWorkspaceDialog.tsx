@@ -6,4 +6,7 @@ interface CreateWorkspaceDialogProps {
 export default function CreateWorkspaceDialog({
   open,
   onOpenChange,
-}: CreateWorkspaceDialogProps) {}
+}: CreateWorkspaceDialogProps) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+}
