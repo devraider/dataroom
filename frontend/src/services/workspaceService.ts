@@ -1,3 +1,4 @@
+import type { UserRole } from "@/types/auth";
 import httpClient from "../lib/httpClient";
 import type {
   AddWorkspaceMember,
@@ -53,7 +54,7 @@ export const workspaceService = {
   updateMemberRole: async (
     workspaceId: number,
     memberId: number,
-    role: string
+    role: UserRole
   ): Promise<UpdateWorkspaceMemberRole> => {
     const response = await httpClient.patch<UpdateWorkspaceMemberRole>(
       `/workspaces/${workspaceId}/members/${memberId}`,
