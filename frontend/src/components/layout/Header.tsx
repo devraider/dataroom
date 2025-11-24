@@ -4,6 +4,7 @@ import UserMenu from "./UserMenu";
 import { useAuthStore } from "@/store/authStore";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { Button } from "../ui/button";
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
@@ -43,6 +44,11 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {isInWorkspace && (
+            <Button variant="outline" onClick={() => navigate("/workspaces")}>
+              Back to Workspaces
+            </Button>
+          )}
           <ThemeToggle />
           {user && <UserMenu user={user} onLogout={handleLogout} />}
         </div>
