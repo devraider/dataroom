@@ -26,7 +26,7 @@ const mockWorkspaces = [
         userId: "1",
         email: "john.doe@example.com",
         name: "John Doe",
-        role: "owner",
+        role: "user",
         addedAt: new Date().toISOString(),
         picture:
           "https://ui-avatars.com/api/?name=Zando+Doe&background=4F46E5&color=fff",
@@ -47,7 +47,7 @@ const mockWorkspaces = [
         userId: "1",
         email: "john.doe@example.com",
         name: "John Doe",
-        role: "owner",
+        role: "admin",
         addedAt: new Date().toISOString(),
       },
     ],
