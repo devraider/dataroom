@@ -35,3 +35,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         bool: True if password matches
     """
     return PWD_CONTEXT.verify(plain_password, hashed_password)
+
+def get_password_hash(password: str) -> str:
+    """Hash password
+
+    Args:
+        password: Plain text password
+
+    Returns:
+        str: Hashed password
+    """
+    return PWD_CONTEXT.hash(password)
