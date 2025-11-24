@@ -14,7 +14,7 @@ class DatabaseSettings(BaseSettings):
     PORT: int
 
     @property
-    def url(self) -> str:
+    def db_url(self) -> str:
         return f"postgresql+psycopg2://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}"
 
 
