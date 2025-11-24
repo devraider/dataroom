@@ -13,42 +13,38 @@ const mockDataMap: Record<string, string> = {
 // Mock workspaces data
 const mockWorkspaces = [
   {
-    id: "1",
+    id: 1,
     name: "Marketing Team",
     description: "Marketing materials and campaign files",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    ownerId: "1",
+    ownerId: 1,
     members: [
       {
-        id: "1",
-        workspaceId: "1",
-        userId: "1",
+        id: 1,
         email: "john.doe@example.com",
         name: "John Doe",
-        role: "user",
-        addedAt: new Date().toISOString(),
+        role: "admin",
         picture:
-          "https://ui-avatars.com/api/?name=Zando+Doe&background=4F46E5&color=fff",
+          "https://ui-avatars.com/api/?name=John+Doe&background=4F46E5&color=fff",
       },
     ],
   },
   {
-    id: "2",
+    id: 2,
     name: "Development",
     description: "Code documentation and technical resources",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    ownerId: "1",
+    ownerId: 1,
     members: [
       {
-        id: "1",
-        workspaceId: "2",
-        userId: "1",
+        id: 1,
         email: "john.doe@example.com",
         name: "John Doe",
         role: "admin",
-        addedAt: new Date().toISOString(),
+        picture:
+          "https://ui-avatars.com/api/?name=John+Doe&background=4F46E5&color=fff",
       },
     ],
   },
@@ -105,20 +101,17 @@ export const setupMockInterceptor = (axiosInstance: AxiosInstance) => {
       // Mock workspace creation
       if (url === "/workspaces" && config.method === "post") {
         const newWorkspace = {
-          id: String(Date.now()),
+          id: Date.now(),
           ...config.data,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          ownerId: "1",
+          ownerId: 1,
           members: [
             {
-              id: "1",
-              workspaceId: String(Date.now()),
-              userId: "1",
+              id: 1,
               email: mockUser.email,
               name: mockUser.name,
-              role: "owner",
-              addedAt: new Date().toISOString(),
+              role: "admin",
               picture: mockUser.picture,
             },
           ],
