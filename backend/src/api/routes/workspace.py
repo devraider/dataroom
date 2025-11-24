@@ -16,7 +16,7 @@ def get_workspaces(
     limit: int = 100,
 ):
     """Get all workspaces"""
-    statement = select(Workspace)
-    workspaces = session.exec(statement).offset(skip).limit(limit).all()
+    statement = select(Workspace).offset(skip).limit(limit)
+    workspaces = session.exec(statement).all()
 
     return workspaces
