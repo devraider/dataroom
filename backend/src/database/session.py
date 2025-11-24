@@ -2,7 +2,7 @@ from typing import Generator
 
 from sqlmodel import Session, SQLModel, create_engine
 
-from backend.src.utils.settings import app_settings, database_settings
+from backend.src.config.settings import app_settings, database_settings
 
 engine = create_engine(
     database_settings.db_url,
