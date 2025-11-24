@@ -1,0 +1,29 @@
+version: "3.8"
+
+x-postgres: &postgres
+  POSTGRES_DB: ${POSTGRES_DB:-dataroom}
+  POSTGRES_USER: ${POSTGRES_USER:-dataroom_user}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dataroom_pass}
+
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dataroom-db
+    environment:
+      <<: *postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - dataroom-network
+
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  dataroom-network:
+    driver: bridge
