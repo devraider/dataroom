@@ -10,12 +10,15 @@ export interface Workspace {
   members: User[];
 }
 
-export interface ActionAddWorkspaceMember {
-  email: string;
-  role: UserRole;
+export interface CreateWorkspace {
+  name: string;
+  description?: string;
 }
-
-export interface ActionUpdateWorkspace {
+export interface UpdateWorkspace {
   name?: string;
   description?: string;
+}
+export interface AddWorkspaceMember {
+  email: string;
+  role: UserRole;
 }
