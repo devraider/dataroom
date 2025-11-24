@@ -6,7 +6,7 @@ from backend.src.api.routes.workspace import workspace_router
 from backend.src.database.session import create_db_and_tables
 
 # Import models so SQLModel knows about them
-from backend.src.models import user, workspace, file  # noqa: F401
+from backend.src.models import file, user, workspace  # noqa: F401
 
 
 @asynccontextmanager
