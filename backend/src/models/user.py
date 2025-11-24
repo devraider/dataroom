@@ -1,9 +1,12 @@
 import datetime as dt
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, SQLModel
 
 from backend.src.types.date import utc_now
+
+if TYPE_CHECKING:
+    from backend.src.models.workspace import WorkspaceMember
 
 
 class UserBase(SQLModel):

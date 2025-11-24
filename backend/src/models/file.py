@@ -1,10 +1,13 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
 from backend.src.models.workspace import Workspace
 from backend.src.types.date import utc_now
+
+if TYPE_CHECKING:
+    from backend.src.models.workspace import Workspace
 
 
 class FileBase(SQLModel):
