@@ -8,6 +8,7 @@ import { EmptyState } from "../common/EmptyState";
 import WorkspaceCard from "./WorkspaceCard";
 import { useState } from "react";
 import { useWorkspaces } from "@/hooks/useWorkspaces";
+import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
 
 export default function WorkspaceList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -80,6 +81,10 @@ export default function WorkspaceList() {
           </div>
         )}
       </div>
+      <CreateWorkspaceDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </Layout>
   );
 }
