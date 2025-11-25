@@ -98,7 +98,7 @@ async def google_login(
 
 
 @auth_router.get("/me")
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(get_current_user)) -> User:
     """Get current authenticated user
     
     Args:
@@ -107,8 +107,4 @@ async def get_me(current_user: User = Depends(get_current_user)):
     Returns:
         dict: User information
     """
-    return {
-        "id": current_user.id,
-        "email": current_user.email,
-        "full_name": current_user.full_name,
-    }
+    return current_user
