@@ -20,9 +20,10 @@ class User(UserBase, table=True):
     __tablename__ = "users"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    google_user_id: str = Field(unique=True, index=True, max_length=255)
     created_at: dt.datetime = Field(default_factory=utc_now)
     updated_at: dt.datetime = Field(default_factory=utc_now)
-    
+    google_user_id: str = Field(unique=True, index=True, max_length=255)
+    google_picture: Optional[str] = Field(default=None, max_length=1024)
+
     # Relationships
     workspaces: list["WorkspaceMember"] = Relationship(back_populates="user")
