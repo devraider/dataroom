@@ -1,9 +1,8 @@
 from datetime import timedelta
 
+import httpx
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token
 from sqlmodel import Session, select
 
 from backend.src.api.auth.security import get_current_user
@@ -22,6 +21,7 @@ async def google_login(
     session: Session = Depends(get_session),
 ):
     """Login with Google OAuth
+    Verifies Google ID token, creates/finds user, and returns JWT access token.
     
     Args:
         request: Google login request with JWT credential
@@ -29,48 +29,72 @@ async def google_login(
         
     Returns:
         TokenResponse: Access token and user info
-        
-    Raises:
-        HTTPException: If Google token is invalid
     """
     try:
-        # Verify Google JWT token
-        client_info = id_token.verify_oauth2_token(
-            request.credential,
-            google_requests.Request(),
-            app_settings.GOOGLE_CLIENT_ID,
-        )
+        # Verify Google token using Google's tokeninfo endpoint
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://oauth2.googleapis.com/tokeninfo",
+                params={"id_token": request.credential},
+                timeout=10.0,
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid Google token",
+                )
+            
+            token_info = response.json()
+
         
-        # Extract user info from Google token
-        email = client_info.get("email")
-        name = client_info.get("name", "")
-        client_id = client_info.get("sub")
+        # Validate token audience
+        if token_info.get("aud") != app_settings.GOOGLE_CLIENT_ID:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Invalid token audience. Got: {token_info.get('aud')}, Expected: {app_settings.GOOGLE_CLIENT_ID}",
+            )
+        
+        # Validate email verification
+        if not token_info.get("email_verified"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email not verified",
+            )
+        
+        # Extract user data
+        email = token_info.get("email")
+        name = token_info.get("name", "")
+        google_id = token_info.get("user_id") or token_info.get("sub")
+        picture = token_info.get("picture", "")
         
         if not email:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email not provided by Google",
+                detail="Email not provided",
             )
         
         # Find or create user
-        statement = select(User).where(User.email == email)
-        user = session.exec(statement).first()
+        user = session.exec(
+            select(User).where(User.google_user_id == google_id)
+        ).first()
         
         if not user:
-            # Create new user
-            user = User(id=client_id, email=email, full_name=name)
+            user = User(
+                email=email,
+                full_name=name,
+                google_user_id=google_id,
+                google_picture=picture,
+            )
             session.add(user)
             session.commit()
             session.refresh(user)
         
-        # Create our own JWT token
-        access_token_expires = timedelta(minutes=app_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        expire = utc_now() + access_token_expires
-        
+        # Generate JWT token
         token_data = {
             "sub": str(user.id),
             "email": user.email,
-            "exp": expire,
+            "exp": utc_now() + timedelta(minutes=app_settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         }
         
         access_token = jwt.encode(
@@ -89,11 +113,12 @@ async def google_login(
             },
         )
         
-    except ValueError as e:
-        # Invalid Google token
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid Google token: {str(e)}",
+            detail=f"Authentication failed: {str(e)}",
         )
 
 
