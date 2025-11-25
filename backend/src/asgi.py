@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.src.api.routes.auth import auth_router
 from backend.src.api.routes.workspace import workspace_router
 from backend.src.config.settings import app_settings
 from backend.src.database.session import create_db_and_tables
@@ -32,5 +33,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-app.include_router(workspace_router)
+app.include_router(workspace_router, prefix="/api")
+app.include_router(auth_router, prefix="/api")
