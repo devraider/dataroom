@@ -24,6 +24,7 @@ class AppSettings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     GOOGLE_CLIENT_ID: str = ""
+    ALLOWED_ORIGINS: list[str] = ["*"]
 
 database_settings = DatabaseSettings()
 app_settings = AppSettings()
