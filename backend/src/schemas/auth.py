@@ -1,7 +1,7 @@
 import pydantic
 from pydantic import BaseModel
 
-from backend.src.models.user import User
+from backend.src.schemas.user import UserResponse
 
 
 class GoogleLoginRequest(BaseModel):
@@ -24,6 +24,5 @@ class GoogleLoginResponse(BaseModel):
 
 class TokenResponse(BaseModel):
     """Token response"""
-    access_token: str
-    token_type: str
-    user: User
+    token: str
+    user: UserResponse
