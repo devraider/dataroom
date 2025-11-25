@@ -16,6 +16,7 @@ from backend.src.schemas.auth import (
 )
 from backend.src.schemas.user import UserResponse
 from backend.src.types.date import utc_now
+from backend.src.types.roles import RoleEnum
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -107,7 +108,9 @@ async def google_login(
             token=access_token,
             user=UserResponse(id=user.id,
                               email=user.email, name=user.full_name,
-                              picture=user.google_picture)
+                              picture=user.google_picture,
+                              role=RoleEnum.ADMIN
+                              )
         )
         
     except HTTPException:
