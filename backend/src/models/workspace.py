@@ -27,8 +27,14 @@ class Workspace(WorkspaceBase, table=True):
     created_by: int = Field(foreign_key="users.id")
 
     # Relationships
-    members: list["WorkspaceMember"] = Relationship(back_populates="workspace")
-    files: list["File"] = Relationship(back_populates="workspace")
+    members: list["WorkspaceMember"] = Relationship(
+        back_populates="workspace",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    files: list["File"] = Relationship(
+        back_populates="workspace",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
 
 
 
