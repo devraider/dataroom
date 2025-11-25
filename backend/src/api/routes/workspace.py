@@ -144,3 +144,20 @@ def update_workspace(
         created_by=existing_workspace.created_by,
         members=members
     )
+
+
+@workspace_router.delete("/{workspace_id}")
+def delete_workspace(
+    workspace_id: int,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+) -> None:
+    """Delete a workspace"""
+    existing_workspace = session.get(Workspace, workspace_id)
+    if not existing_workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+    session.delete(existing_workspace)
+    session.commit()
+
+    return
