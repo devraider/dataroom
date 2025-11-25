@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from backend.src.types.roles import RoleEnum
+
 
 class UserResponse(BaseModel):
 
@@ -7,4 +9,5 @@ class UserResponse(BaseModel):
     id: int
     email: str
     name: str
+    role: RoleEnum
     picture: str | None
