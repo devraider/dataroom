@@ -14,6 +14,7 @@ from backend.src.schemas.auth import (
     GoogleLoginResponse,
     TokenResponse,
 )
+from backend.src.schemas.user import UserResponse
 from backend.src.types.date import utc_now
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -103,9 +104,10 @@ async def google_login(
         )
         
         return TokenResponse(
-            access_token=access_token,
-            token_type="bearer",
-            user=user
+            token=access_token,
+            user=UserResponse(id=user.id,
+                              email=user.email, name=user.full_name,
+                              picture=user.google_picture)
         )
         
     except HTTPException:
