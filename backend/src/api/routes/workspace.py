@@ -7,6 +7,7 @@ from backend.src.database.session import get_session
 from backend.src.models.user import User
 from backend.src.models.workspace import Workspace, WorkspaceMember
 from backend.src.schemas.workspace import (
+    WorkspaceAddMember,
     WorkspaceCreate,
     WorkspaceMemberResponse,
     WorkspaceResponse,
@@ -161,3 +162,65 @@ def delete_workspace(
     session.commit()
 
     return
+
+@workspace_router.post("/{workspace_id}/members", response_model=WorkspaceResponse)
+def add_workspace_member(
+    workspace_id: int,
+    member: WorkspaceAddMember,
+    session: Session = Depends(get_session),
+):
+    """Add a member to a workspace by email (creates user if needed)"""
+    existing_workspace = session.get(Workspace, workspace_id)
+    if not existing_workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+    # Try to find existing user by email
+    user_to_add = session.exec(select(User).where(User.email == member.email)).first()
+    
+    if not user_to_add:
+        # User doesn't exist yet - store email for invitation
+        # For now, we'll reject until they sign up
+        raise HTTPException(
+            status_code=404, 
+            detail="User not found. They need to sign up first before being added to a workspace."
+        )
+
+    # Check if user is already a member
+    existing_member = session.exec(
+        select(WorkspaceMember).where(
+            WorkspaceMember.workspace_id == workspace_id,
+            WorkspaceMember.user_id == user_to_add.id
+        )
+    ).first()
+    if existing_member:
+        raise HTTPException(status_code=400, detail="User is already a member")
+
+    workspace_member = WorkspaceMember(
+        workspace_id=workspace_id,
+        user_id=user_to_add.id,
+        role=member.role
+    )
+    session.add(workspace_member)
+    session.commit()
+    session.refresh(existing_workspace)
+
+    members = [
+        WorkspaceMemberResponse(
+            id=m.user.id,
+            email=m.user.email,
+            name=m.user.full_name,
+            picture=m.user.google_picture,
+            role=m.role
+        )
+        for m in existing_workspace.members
+    ]
+
+    return WorkspaceResponse(
+        id=existing_workspace.id,
+        name=existing_workspace.name,
+        description=existing_workspace.description,
+        created_at=existing_workspace.created_at,
+        updated_at=existing_workspace.updated_at,
+        created_by=existing_workspace.created_by,
+        members=members
+    )
