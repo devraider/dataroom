@@ -10,7 +10,32 @@ from backend.src.models.workspace import Workspace, WorkspaceMember
 files_router = APIRouter()
 
 
-@files_router.get("/")
-def list_files():
-    """List all files (placeholder)"""
-    return {"message": "List of files"}
+@files_router.get("/", response_model=list[File])
+def get_workspace_files(
+    workspace_id: int,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """Get all files in a workspace"""
+    # Verify workspace exists and user is a member
+    workspace = session.get(Workspace, workspace_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+    
+    # Check if user is a member
+    is_member = session.exec(
+        select(WorkspaceMember).where(
+            WorkspaceMember.workspace_id == workspace_id,
+            WorkspaceMember.user_id == current_user.id
+        )
+    ).first()
+    
+    if not is_member:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get files for this workspace
+    files = session.exec(
+        select(File).where(File.workspace_id == workspace_id)
+    ).all()
+    
+    return files
