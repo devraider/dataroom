@@ -9,7 +9,11 @@ from backend.src.api.auth.security import get_current_user
 from backend.src.config.settings import app_settings
 from backend.src.database.session import get_session
 from backend.src.models.user import User
-from backend.src.schemas.auth import GoogleLoginRequest, TokenResponse
+from backend.src.schemas.auth import (
+    GoogleLoginRequest,
+    GoogleLoginResponse,
+    TokenResponse,
+)
 from backend.src.types.date import utc_now
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -47,28 +51,23 @@ async def google_login(
             
             token_info = response.json()
 
-        
+        google_login_response = GoogleLoginResponse.model_validate(token_info)
+
         # Validate token audience
-        if token_info.get("aud") != app_settings.GOOGLE_CLIENT_ID:
+        if google_login_response.audience != app_settings.GOOGLE_CLIENT_ID:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Invalid token audience. Got: {token_info.get('aud')}, Expected: {app_settings.GOOGLE_CLIENT_ID}",
             )
-        
+
         # Validate email verification
-        if not token_info.get("email_verified"):
+        if not google_login_response.email_verified:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email not verified",
             )
         
-        # Extract user data
-        email = token_info.get("email")
-        name = token_info.get("name", "")
-        google_id = token_info.get("user_id") or token_info.get("sub")
-        picture = token_info.get("picture", "")
-        
-        if not email:
+        if not google_login_response.email:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email not provided",
@@ -76,15 +75,15 @@ async def google_login(
         
         # Find or create user
         user = session.exec(
-            select(User).where(User.google_user_id == google_id)
+            select(User).where(User.google_user_id == google_login_response.user_id)
         ).first()
         
         if not user:
             user = User(
-                email=email,
-                full_name=name,
-                google_user_id=google_id,
-                google_picture=picture,
+                email=google_login_response.email,
+                full_name=google_login_response.name,
+                google_user_id=google_login_response.user_id,
+                google_picture=google_login_response.picture,
             )
             session.add(user)
             session.commit()
@@ -106,11 +105,7 @@ async def google_login(
         return TokenResponse(
             access_token=access_token,
             token_type="bearer",
-            user={
-                "id": user.id,
-                "email": user.email,
-                "full_name": user.full_name,
-            },
+            user=user
         )
         
     except HTTPException:
