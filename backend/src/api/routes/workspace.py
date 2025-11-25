@@ -6,7 +6,7 @@ from backend.src.api.auth.security import get_current_user
 from backend.src.database.session import get_session
 from backend.src.models.user import User
 from backend.src.models.workspace import Workspace, WorkspaceMember
-from backend.src.schemas.workspace import WorkspaceResponse
+from backend.src.schemas.workspace import WorkspaceCreate, WorkspaceResponse
 
 workspace_router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 
@@ -30,3 +30,24 @@ def get_workspaces(
     workspaces = session.exec(statement).all()
 
     return workspaces
+
+
+@workspace_router.post("/", response_model=WorkspaceResponse)
+def create_workspace(
+    workspace: WorkspaceCreate,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """Create a new workspace and add the current user as a member"""
+    new_workspace = Workspace(name=workspace.name, description=workspace.description, created_by=current_user.id)
+    session.add(new_workspace)
+    session.commit()
+    session.refresh(new_workspace)
+
+    workspace_member = WorkspaceMember(
+        workspace_id=new_workspace.id, user_id=current_user.id
+    )
+    session.add(workspace_member)
+    session.commit()
+
+    return new_workspace
