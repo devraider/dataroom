@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from backend.src.api.auth.security import get_current_user
+from backend.src.api.routes.files import files_router
 from backend.src.database.session import get_session
 from backend.src.models.user import User
 from backend.src.models.workspace import Workspace, WorkspaceMember
@@ -15,6 +16,13 @@ from backend.src.schemas.workspace import (
 from backend.src.types.roles import RoleEnum
 
 workspace_router = APIRouter(prefix="/workspaces", tags=["workspaces"])
+
+# Include files subrouter
+workspace_router.include_router(
+    files_router,
+    prefix="/{workspace_id}/files",
+    tags=["files"]
+)
 
 
 @workspace_router.get("/", response_model=list[WorkspaceResponse])
