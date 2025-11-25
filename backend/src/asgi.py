@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.src.api.routes.auth import auth_router
-from backend.src.api.routes.files import files_router
 from backend.src.api.routes.workspace import workspace_router
 from backend.src.config.settings import app_settings
 from backend.src.database.session import create_db_and_tables
