@@ -35,7 +35,7 @@ export default function ManageMembersDialog({
 }: ManageMembersDialogProps) {
   const { addMember, isAddingMember } = useWorkspaces();
   const [newMemberEmail, setNewMemberEmail] = useState("");
-  const [newMemberRole, setNewMemberRole] = useState<UserRole>(UserRole.READER);
+  const [newMemberRole, setNewMemberRole] = useState<UserRole>(UserRole.VIEWER);
 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +56,7 @@ export default function ManageMembersDialog({
       {
         onSuccess: () => {
           setNewMemberEmail("");
-          setNewMemberRole(UserRole.READER);
+          setNewMemberRole(UserRole.VIEWER);
         },
       }
     );
@@ -93,7 +93,7 @@ export default function ManageMembersDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={UserRole.READER}>Viewer</SelectItem>
+                <SelectItem value={UserRole.VIEWER}>Viewer</SelectItem>
                 <SelectItem value={UserRole.USER}>Editor</SelectItem>
                 <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
               </SelectContent>
