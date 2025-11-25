@@ -16,6 +16,9 @@ class FileBase(SQLModel):
     file_path: str = Field(max_length=500)
     file_size: int = Field(default=0)
     mime_type: Optional[str] = Field(default=None, max_length=100)
+    google_drive_id: Optional[str] = Field(default=None, max_length=255)
+    thumbnail_url: Optional[str] = Field(default=None, max_length=500)
+    web_view_link: Optional[str] = Field(default=None, max_length=500)
 
 
 class File(FileBase, table=True):
