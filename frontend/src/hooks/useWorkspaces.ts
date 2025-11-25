@@ -25,7 +25,7 @@ export const useWorkspaces = () => {
     onError: (error: any) => {
       toast.error("Creation failed", {
         description:
-          error.response?.data?.message || "Failed to create workspace",
+          error.response?.data?.detail || "Failed to create workspace",
       });
     },
   });
@@ -42,7 +42,7 @@ export const useWorkspaces = () => {
     onError: (error: any) => {
       toast.error("Update failed", {
         description:
-          error.response?.data?.message || "Failed to update workspace",
+          error.response?.data?.detail || "Failed to update workspace",
       });
     },
   });
@@ -58,7 +58,7 @@ export const useWorkspaces = () => {
     onError: (error: any) => {
       toast.error("Delete failed", {
         description:
-          error.response?.data?.message || "Failed to delete workspace",
+          error.response?.data?.detail || "Failed to delete workspace",
       });
     },
   });
@@ -79,7 +79,7 @@ export const useWorkspaces = () => {
     },
     onError: (error: any) => {
       toast.error("Failed to add member", {
-        description: error.response?.data?.message || "Could not add member",
+        description: error.response?.data?.detail || "Could not add member",
       });
     },
   });
@@ -100,7 +100,7 @@ export const useWorkspaces = () => {
     },
     onError: (error: any) => {
       toast.error("Failed to remove member", {
-        description: error.response?.data?.message || "Could not remove member",
+        description: error.response?.data?.detail || "Could not remove member",
       });
     },
   });
@@ -123,7 +123,7 @@ export const useWorkspaces = () => {
     },
     onError: (error: any) => {
       toast.error("Failed to update role", {
-        description: error.response?.data?.message || "Could not update role",
+        description: error.response?.data?.detail || "Could not update role",
       });
     },
   });
