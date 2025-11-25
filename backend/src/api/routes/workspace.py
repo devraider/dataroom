@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from backend.src.api.auth.security import get_current_user
@@ -103,4 +103,44 @@ def create_workspace(
                 role=RoleEnum.ADMIN
             )
         ]
+    )
+
+
+@workspace_router.put("/{workspace_id}", response_model=WorkspaceResponse)
+def update_workspace(
+    workspace_id: int,
+    workspace: WorkspaceCreate,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """Update an existing workspace"""
+    existing_workspace = session.get(Workspace, workspace_id)
+    if not existing_workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+    existing_workspace.name = workspace.name
+    existing_workspace.description = workspace.description
+    session.add(existing_workspace)
+    session.commit()
+    session.refresh(existing_workspace)
+
+    members = [
+        WorkspaceMemberResponse(
+            id=member.user.id,
+            email=member.user.email,
+            name=member.user.full_name,
+            picture=member.user.google_picture,
+            role=member.role
+        )
+        for member in existing_workspace.members
+    ]
+
+    return WorkspaceResponse(
+        id=existing_workspace.id,
+        name=existing_workspace.name,
+        description=existing_workspace.description,
+        created_at=existing_workspace.created_at,
+        updated_at=existing_workspace.updated_at,
+        created_by=existing_workspace.created_by,
+        members=members
     )
