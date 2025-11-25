@@ -36,4 +36,3 @@ app.add_middleware(
 
 app.include_router(workspace_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
-app.include_router(files_router, prefix="/api")
