@@ -33,3 +33,9 @@ class WorkspaceCreate(BaseModel):
 
     name: str
     description: Optional[str] = None
+
+class WorkspaceAddMember(BaseModel):
+    """Schema for adding a member to a workspace"""
+
+    email: str
+    role: RoleEnum
