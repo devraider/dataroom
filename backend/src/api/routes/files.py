@@ -152,3 +152,29 @@ def delete_file(
     session.commit()
 
     return None
+
+
+@files_router.get("/{file_id}/download")
+def download_file(
+        workspace_id: int,
+        file_id: int,
+        current_user: User = Depends(get_current_user),
+        session: Session = Depends(get_session),
+):
+    """Download a file from a workspace"""
+    # Verify workspace exists and user is a member
+    workspace = session.get(Workspace, workspace_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+        # Check if user is a member
+    is_member = session.exec(
+        select(WorkspaceMember).where(
+            WorkspaceMember.workspace_id == workspace_id,
+            WorkspaceMember.user_id == current_user.id
+        )
+    ).first()
+
+    if not is_member:
+        raise HTTPException(status_code=403, detail="Access denied")
+
