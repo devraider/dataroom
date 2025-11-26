@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -25,6 +27,7 @@ class AppSettings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     GOOGLE_CLIENT_ID: str = ""
     ALLOWED_ORIGINS: list[str] = ["*"]
+    STORAGE_BASE_PATH: Path = Path(__file__).parent.parent / "storage"
 
 database_settings = DatabaseSettings()
 app_settings = AppSettings()
