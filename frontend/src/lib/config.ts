@@ -5,7 +5,9 @@ export const CONFIG = {
     : 30000,
   MODE: import.meta.env.VITE_MODE || "demo",
   GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  GOOGLE_API_KEY: import.meta.env.VITE_GOOGLE_API_KEY,
   GOOGLE_DRIVE_SCOPE: import.meta.env.VITE_GOOGLE_SCOPE,
+  GOOGLE_APP_ID: import.meta.env.VITE_GOOGLE_APP_ID,
 } as const;
 
 export const isDemoMode = () => CONFIG.MODE === "demo";
