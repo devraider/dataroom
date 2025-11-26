@@ -3,6 +3,7 @@ import shutil
 
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from sqlmodel import Session, select
+from starlette.responses import FileResponse as StarletteFileResponse
 
 from backend.src.api.auth.security import get_current_user
 from backend.src.config.settings import app_settings
@@ -162,6 +163,7 @@ def download_file(
         session: Session = Depends(get_session),
 ):
     """Download a file from a workspace"""
+
     workspace = session.get(Workspace, workspace_id)
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
@@ -175,4 +177,21 @@ def download_file(
 
     if not is_member:
         raise HTTPException(status_code=403, detail="Access denied")
+
+    db_file = session.get(File, file_id)
+    if not db_file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    if db_file.workspace_id != workspace_id:
+        raise HTTPException(status_code=403, detail="File does not belong to this workspace")
+
+    file_path = app_settings.STORAGE_BASE_PATH / db_file.file_path
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Physical file not found")
+
+    return StarletteFileResponse(
+        path=str(file_path),
+        filename=db_file.name,
+        media_type=db_file.mime_type or "application/octet-stream",
+    )
 
