@@ -1,9 +1,12 @@
 
+import shutil
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from backend.src.api.auth.security import get_current_user
 from backend.src.api.routes.files import files_router
+from backend.src.config.settings import app_settings
 from backend.src.database.session import get_session
 from backend.src.models.user import User
 from backend.src.models.workspace import Workspace, WorkspaceMember
@@ -165,6 +168,13 @@ def delete_workspace(
     existing_workspace = session.get(Workspace, workspace_id)
     if not existing_workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
+
+    workspace_dir = app_settings.STORAGE_BASE_PATH / str(workspace_id)
+    if workspace_dir.exists():
+        try:
+            shutil.rmtree(workspace_dir)
+        except Exception as e:
+            print(f"Warning: Failed to delete workspace directory: {str(e)}")
 
     session.delete(existing_workspace)
     session.commit()
