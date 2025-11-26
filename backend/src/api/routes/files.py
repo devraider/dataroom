@@ -1,4 +1,3 @@
-import os
 import shutil
 
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
@@ -27,7 +26,7 @@ def get_workspace_files(
     workspace = session.get(Workspace, workspace_id)
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
-    
+
     # Check if user is a member
     is_member = session.exec(
         select(WorkspaceMember).where(
@@ -35,15 +34,15 @@ def get_workspace_files(
             WorkspaceMember.user_id == current_user.id
         )
     ).first()
-    
+
     if not is_member:
         raise HTTPException(status_code=403, detail="Access denied")
-    
+
     # Get files for this workspace
     files = session.exec(
         select(File).where(File.workspace_id == workspace_id)
     ).all()
-    
+
     return files
 
 
@@ -75,9 +74,8 @@ async def import_from_google_drive(
     workspace_dir.mkdir(parents=True, exist_ok=True)
 
     # Generate unique filename
-    file_extension = os.path.splitext(file.filename or "")[1]
     timestamp = utc_now()
-    unique_filename = f"{timestamp}_{file.filename}.{file_extension}"
+    unique_filename = f"{timestamp}_{file.filename}"
     file_path = workspace_dir / unique_filename
 
     # Save the file
