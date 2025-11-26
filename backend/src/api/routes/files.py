@@ -111,7 +111,7 @@ async def import_from_google_drive(
     return FileResponse.model_validate(db_file)
 
 
-@files_router.delete("/{file_id}")
+@files_router.delete("/{file_id}", status_code=204)
 def delete_file(
         workspace_id: int,
         file_id: int,
@@ -124,7 +124,6 @@ def delete_file(
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
 
-        # Check if user is a member
     is_member = session.exec(
         select(WorkspaceMember).where(
             WorkspaceMember.workspace_id == workspace_id,
@@ -143,13 +142,13 @@ def delete_file(
         raise HTTPException(status_code=403, detail="File does not belong to this workspace")
 
     try:
-        file_path =  app_settings.STORAGE_BASE_PATH / db_file.file_path
+        file_path = app_settings.STORAGE_BASE_PATH / db_file.file_path
         if file_path.exists():
             file_path.unlink()
     except Exception as e:
         print(f"Warning: Failed to delete physical file: {str(e)}")
 
-    session.commit()
     session.delete(db_file)
+    session.commit()
 
-    return {"detail": "File deleted successfully"}
+    return None
