@@ -162,12 +162,10 @@ def download_file(
         session: Session = Depends(get_session),
 ):
     """Download a file from a workspace"""
-    # Verify workspace exists and user is a member
     workspace = session.get(Workspace, workspace_id)
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
 
-        # Check if user is a member
     is_member = session.exec(
         select(WorkspaceMember).where(
             WorkspaceMember.workspace_id == workspace_id,
