@@ -12,7 +12,7 @@ class FileResponse(BaseSchema):
     id: int
     name: str
     file_path: str
-    size: int = Field(alias="fileSize")
+    file_size: int = Field(alias="fileSize")
     mime_type: Optional[str] = Field(default=None, alias="mimeType")
     google_drive_id: Optional[str] = Field(default=None, alias="googleDriveId")
     thumbnail_url: Optional[str] = Field(default=None, alias="thumbnailUrl")
@@ -20,4 +20,4 @@ class FileResponse(BaseSchema):
     workspace_id: int = Field(alias="workspaceId")
     uploaded_by: int = Field(alias="uploadedBy")
     created_at: datetime = Field(alias="createdAt")
-    modified_at: datetime = Field(alias="modifiedAt")
+    updated_at: datetime = Field(alias="modifiedAt")
