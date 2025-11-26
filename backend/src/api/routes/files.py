@@ -150,5 +150,6 @@ def delete_file(
         print(f"Warning: Failed to delete physical file: {str(e)}")
 
     session.commit()
+    session.delete(db_file)
 
     return {"detail": "File deleted successfully"}
