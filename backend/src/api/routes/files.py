@@ -109,3 +109,46 @@ async def import_from_google_drive(
     session.refresh(db_file)
 
     return FileResponse.model_validate(db_file)
+
+
+@files_router.delete("/{file_id}")
+def delete_file(
+        workspace_id: int,
+        file_id: int,
+        current_user: User = Depends(get_current_user),
+        session: Session = Depends(get_session),
+):
+    """Delete a file from a workspace"""
+
+    workspace = session.get(Workspace, workspace_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+        # Check if user is a member
+    is_member = session.exec(
+        select(WorkspaceMember).where(
+            WorkspaceMember.workspace_id == workspace_id,
+            WorkspaceMember.user_id == current_user.id
+        )
+    ).first()
+
+    if not is_member:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    db_file = session.get(File, file_id)
+    if not db_file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    if db_file.workspace_id != workspace_id:
+        raise HTTPException(status_code=403, detail="File does not belong to this workspace")
+
+    try:
+        file_path =  app_settings.STORAGE_BASE_PATH / db_file.file_path
+        if file_path.exists():
+            file_path.unlink()
+    except Exception as e:
+        print(f"Warning: Failed to delete physical file: {str(e)}")
+
+    session.commit()
+
+    return {"detail": "File deleted successfully"}
