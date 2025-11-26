@@ -1,4 +1,3 @@
-import datetime
 import os
 import shutil
 
@@ -70,10 +69,35 @@ async def import_from_google_drive(
     if not is_member:
         raise HTTPException(status_code=403, detail="Access denied")
 
+    # Create workspace-specific directory
+    workspace_dir = app_settings.STORAGE_BASE_PATH / str(workspace_id)
+    workspace_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate unique filename
+    file_extension = os.path.splitext(file.filename or "")[1]
+    timestamp = utc_now()
+    unique_filename = f"{timestamp}_{file.filename}.{file_extension}"
+    file_path = workspace_dir / unique_filename
+
+    # Save the file
+    try:
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to save file: {str(e)}"
+        )
+    finally:
+        file.file.close()
+
+    file_size = file_path.stat().st_size
+
+
     db_file = File(
         name=file.filename or "unknown",
-        file_path="",
-        file_size=0,
+        file_path=str(file_path),
+        file_size=file_size,
         mime_type=file.content_type,
         workspace_id=workspace_id,
         uploaded_by=current_user.id,
