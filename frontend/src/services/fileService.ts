@@ -1,5 +1,10 @@
 import type { DataRoomFile } from "@/types/file";
 import apiClient from "@/lib/httpClient";
+import {
+  downloadGoogleDriveFile,
+  type GoogleDriveFile,
+} from "@/lib/googleDrive";
+import type { ImportGoogleDriveOptions } from "@/types/googleDrive";
 
 export const fileService = {
   getAll: async (workspaceId: number): Promise<DataRoomFile[]> => {
@@ -27,6 +32,40 @@ export const fileService = {
         responseType: "blob",
       }
     );
+    return data;
+  },
+
+  importFromGoogleDrive: async (
+    workspaceId: number,
+    googleDriveFileId: string,
+    accessToken: string,
+    options: ImportGoogleDriveOptions
+  ): Promise<DataRoomFile> => {
+    const blob = await downloadGoogleDriveFile(
+      {
+        id: googleDriveFileId,
+        name: options.name,
+        mimeType: options.originalMimeType,
+      } as GoogleDriveFile,
+      accessToken
+    );
+
+    // Create FormData to upload the file
+    const formData = new FormData();
+    formData.append("file", blob, options.name);
+    formData.append("googleDriveId", googleDriveFileId);
+
+    // Upload to backend
+    const { data } = await apiClient.post<DataRoomFile>(
+      `/workspaces/${workspaceId}/files/import/google-drive`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
     return data;
   },
 };
