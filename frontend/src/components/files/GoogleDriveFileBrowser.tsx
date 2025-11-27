@@ -44,6 +44,24 @@ export function GoogleDriveFileBrowser({
     return mimeType === "application/vnd.google-apps.folder";
   }
 
+  function getFileIcon(mimeType: string) {
+    if (isFolder(mimeType)) return <Folder className="h-5 w-5 text-blue-500" />;
+    if (mimeType.includes("document"))
+      return <FileText className="h-5 w-5 text-blue-600" />;
+    if (mimeType.includes("spreadsheet"))
+      return <Sheet className="h-5 w-5 text-green-600" />;
+    if (mimeType.includes("presentation"))
+      return <Presentation className="h-5 w-5 text-orange-600" />;
+    if (mimeType.startsWith("image"))
+      return <Image className="h-5 w-5 text-purple-600" />;
+    if (mimeType.startsWith("video"))
+      return <Video className="h-5 w-5 text-red-600" />;
+    if (mimeType.startsWith("audio"))
+      return <Music className="h-5 w-5 text-pink-600" />;
+    if (mimeType.includes("zip") || mimeType.includes("compressed"))
+      return <Archive className="h-5 w-5 text-yellow-600" />;
+    return <File className="h-5 w-5 text-gray-600" />;
+  }
   return (
     <div className="flex flex-col h-[500px]">
       {/* Breadcrumbs */}
