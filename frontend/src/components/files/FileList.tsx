@@ -78,15 +78,15 @@ export default function FileList() {
     }
   }
 
-  async function handleDownload(fileId: number) {
+  async function handleDownload(file: DataRoomFile) {
     if (!workspaceId) return;
 
     try {
-      const blob = await fileService.fileDownload(Number(workspaceId), fileId);
+      const blob = await fileService.download(Number(workspaceId), file.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "";
+      a.download = file.name;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -157,7 +157,7 @@ export default function FileList() {
                     file={file}
                     onView={handleView}
                     onDelete={handleDelete}
-                    onDownload={handleDownload}
+                    onDownload={() => handleDownload(file)}
                   />
                 ))}
               </div>
@@ -194,7 +194,7 @@ export default function FileList() {
                           View
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDownload(file.id)}>
+                          onClick={() => handleDownload(file)}>
                           <Download className="mr-2 h-4 w-4" />
                           Download
                         </DropdownMenuItem>
