@@ -9,7 +9,7 @@ export enum StorageKey {
   THEME = "theme-storage",
 }
 
-export enum ImportProgress {
+export enum ImportProgressStatus {
   PENDING = "pending",
   UPLOADING = "uploading",
   SUCCESS = "success",
