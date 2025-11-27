@@ -184,10 +184,13 @@ export function GoogleDriveFileBrowser({
     setIsSearching(false);
   }
 
-  function formatFileSize(bytes?: number): string {
+  function formatFileSize(bytes?: number | string): string {
     if (!bytes) return "-";
+    const numBytes = typeof bytes === "string" ? parseInt(bytes, 10) : bytes;
+    if (isNaN(numBytes)) return "-";
+
     const units = ["B", "KB", "MB", "GB"];
-    let size = bytes;
+    let size = numBytes;
     let unitIndex = 0;
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
