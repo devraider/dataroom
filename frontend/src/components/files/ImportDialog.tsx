@@ -16,6 +16,8 @@ import { useGoogleDrive } from "@/hooks/useGoogleDrive";
 import { GoogleDriveFileBrowser } from "./GoogleDriveFileBrowser";
 import type { GoogleDriveFile } from "@/types/googleDrive";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { useAuthStore } from "@/store/authStore";
+import { canImportFiles } from "@/lib/permissions";
 import { toast } from "sonner";
 import { QUERY_KEYS } from "@/lib/queryKeys";
 import { queryClient } from "@/lib/queryClient";
@@ -40,6 +42,10 @@ export function ImportDialog() {
   const [isImporting, setIsImporting] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<GoogleDriveFile[]>([]);
   const { currentWorkspace } = useWorkspaceStore();
+  const user = useAuthStore((state) => state.user);
+
+  // Check if user can import files
+  const canImport = canImportFiles(user, currentWorkspace);
 
   function initializeImportProgress() {
     setImportProgress(
@@ -119,6 +125,11 @@ export function ImportDialog() {
   }
 
   async function handleImport(): Promise<void> {
+    if (!canImport) {
+      toast.error("You don't have permission to import files");
+      return;
+    }
+
     if (!currentWorkspace || !accessToken || selectedFiles.length === 0) {
       console.warn("Import blocked: Missing workspace, token, or files");
       toast.error("Cannot import files at this time.");
@@ -152,7 +163,13 @@ export function ImportDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button
+          disabled={!canImport}
+          title={
+            !canImport
+              ? "You don't have permission to import files"
+              : "Import files from Google Drive"
+          }>
           <Upload className="mr-2 h-4 w-4" />
           Import from Google Drive
         </Button>

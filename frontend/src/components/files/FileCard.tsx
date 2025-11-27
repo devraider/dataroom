@@ -6,8 +6,9 @@ import { FileActions } from "./FileActions";
 export interface FileCardProps {
   file: DataRoomFile;
   onView?: (file: DataRoomFile) => void;
-  onDelete?: (fileId: number) => void;
-  onDownload?: (fileId: number) => void;
+  onDelete?: () => void;
+  onDownload?: () => void;
+  canDelete?: boolean;
 }
 
 export function FileCard({
@@ -15,6 +16,7 @@ export function FileCard({
   onView,
   onDelete,
   onDownload,
+  canDelete = true,
 }: FileCardProps) {
   const fileIcon = getFileIcon(file.mimeType);
 
@@ -26,10 +28,10 @@ export function FileCard({
           <FileActions
             fileId={file.id}
             fileName={file.name}
-            webViewLink={file.webViewLink}
+            webViewLink={file.webViewLink || undefined}
             onView={() => onView?.(file)}
-            onDelete={() => onDelete?.(file.id)}
-            onDownload={() => onDownload?.(file.id)}
+            onDelete={canDelete ? onDelete : undefined}
+            onDownload={onDownload}
           />
         </div>
 

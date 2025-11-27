@@ -29,6 +29,8 @@ import { formatDate, formatBytes, getFileIcon } from "@/lib/utils";
 import { FileViewer } from "./FileViewer";
 import { fileService } from "@/services/fileService";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/authStore";
+import { canImportFiles, canDeleteFile } from "@/lib/permissions";
 
 enum ViewMode {
   Grid = "grid",
@@ -43,10 +45,15 @@ export default function FileList() {
   const setCurrentWorkspace = useWorkspaceStore(
     (state) => state.setCurrentWorkspace
   );
+  const currentWorkspace = useWorkspaceStore((state) => state.currentWorkspace);
+  const user = useAuthStore((state) => state.user);
   const { workspace } = useWorkspace(workspaceId ? Number(workspaceId) : 0);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.Grid);
   const [viewingFile, setViewingFile] = useState<DataRoomFile | null>(null);
+
+  // Check permissions
+  const canImport = canImportFiles(user, currentWorkspace);
 
   // Set current workspace when workspace data is loaded
   useEffect(() => {
@@ -66,9 +73,14 @@ export default function FileList() {
     setViewingFile(file);
   }
 
-  function handleDelete(fileId: number) {
+  function handleDelete(file: DataRoomFile) {
+    if (!canDeleteFile(user, currentWorkspace, file)) {
+      toast.error("You don't have permission to delete this file");
+      return;
+    }
+
     if (confirm("Are you sure you want to delete this file?")) {
-      deleteFile(fileId);
+      deleteFile(file.id);
     }
   }
 
@@ -134,7 +146,7 @@ export default function FileList() {
                   <List className="h-4 w-4" />
                 </Button>
               </div>
-              <ImportDialog />
+              {canImport && <ImportDialog />}
             </div>
           )}
         </div>
@@ -150,8 +162,9 @@ export default function FileList() {
                     key={file.id}
                     file={file}
                     onView={handleView}
-                    onDelete={handleDelete}
+                    onDelete={() => handleDelete(file)}
                     onDownload={() => handleDownload(file)}
+                    canDelete={canDeleteFile(user, currentWorkspace, file)}
                   />
                 ))}
               </div>
@@ -191,12 +204,14 @@ export default function FileList() {
                           <Download className="mr-2 h-4 w-4" />
                           Download
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(file.id)}
-                          className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
+                        {canDeleteFile(user, currentWorkspace, file) && (
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(file)}
+                            className="text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -212,8 +227,12 @@ export default function FileList() {
         ) : (
           <EmptyState
             title="No files yet"
-            description="Import files from Google Drive to get started"
-            action={<ImportDialog />}
+            description={
+              canImport
+                ? "Import files from Google Drive to get started"
+                : "No files available"
+            }
+            action={canImport ? <ImportDialog /> : undefined}
           />
         )}
       </div>
