@@ -1,24 +1,16 @@
 import type { GoogleDriveFile } from "@/lib/googleDrive";
-import { Button } from "../ui/button";
+import { cn, getFileIcon, isFolder } from "@/lib/utils";
 import {
-  Archive,
-  ChevronRight,
-  FileText,
-  Home,
-  Music,
-  Presentation,
-  Sheet,
-  Video,
-  File,
-  Image,
-  Folder,
-  Search,
   Check,
+  ChevronRight,
+  Folder,
+  Home,
   Loader2,
+  Search,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { cn } from "@/lib/utils";
 
 interface GoogleDriveFileBrowserProps {
   accessToken: string;
@@ -46,18 +38,142 @@ export function GoogleDriveFileBrowser({
   const [error, setError] = useState<string | null>(null);
   const [currentFolderId, setCurrentFolderId] = useState("root");
 
-  function handleBreadcrumbClick(index: number): void {
-    throw new Error("Function not implemented.");
+  useEffect(() => {
+    if (isSearching) return;
+
+    const loadFiles = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await listGoogleDriveFiles(accessToken, currentFolderId);
+        setFiles(result);
+      } catch (err) {
+        console.error("Error loading files:", err);
+        setError(err instanceof Error ? err.message : "Failed to load files");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFiles();
+  }, [accessToken, currentFolderId, isSearching]);
+
+  async function searchGoogleDriveFiles(
+    accessToken: string,
+    searchQuery: string
+  ): Promise<GoogleDriveFile[]> {
+    if (!searchQuery.trim()) {
+      return [];
+    }
+
+    const query = `name contains '${searchQuery
+      .replace(/'/g, "\\'")
+      .trim()}' and trashed=false`;
+
+    const params = new URLSearchParams({
+      q: query,
+      fields:
+        "files(id,name,mimeType,size,iconLink,thumbnailLink,webViewLink,modifiedTime)",
+      orderBy: "modifiedTime desc",
+      pageSize: "50",
+    });
+
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to search files: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.files || [];
   }
 
-  function isFolder(mimeType: string): boolean {
-    return mimeType === "application/vnd.google-apps.folder";
+  async function listGoogleDriveFiles(
+    accessToken: string,
+    folderId: string = "root",
+    searchQuery?: string
+  ): Promise<GoogleDriveFile[]> {
+    let query = `'${folderId}' in parents and trashed=false`;
+
+    if (searchQuery) {
+      query += ` and (name contains '${searchQuery.replace(/'/g, "\\'")}')`;
+    }
+
+    const params = new URLSearchParams({
+      q: query,
+      fields:
+        "files(id,name,mimeType,size,iconLink,thumbnailLink,webViewLink,modifiedTime)",
+      orderBy: "folder,name",
+      pageSize: "100",
+    });
+
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to list files: ${response.statusText}`);
+    }
+    ``;
+
+    const data = await response.json();
+    return data.files || [];
+  }
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setIsSearching(false);
+      return;
+    }
+
+    const searchTimeout = setTimeout(async () => {
+      setIsLoading(true);
+      setError(null);
+      setIsSearching(true);
+      try {
+        const result = await searchGoogleDriveFiles(accessToken, searchQuery);
+        setFiles(result);
+      } catch (err) {
+        console.error("Error searching files:", err);
+        setError(err instanceof Error ? err.message : "Failed to search files");
+      } finally {
+        setIsLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(searchTimeout);
+  }, [searchQuery, accessToken]);
+
+  function handleBreadcrumbClick(index: number): void {
+    const breadcrumb = breadcrumbs[index];
+    setCurrentFolderId(breadcrumb.id);
+    setBreadcrumbs(breadcrumbs.slice(0, index + 1));
+    setSearchQuery("");
+    setIsSearching(false);
   }
 
   function handleFileToggle(file: GoogleDriveFile) {
     if (isFolder(file.mimeType)) {
       handleFolderClick(file);
       return;
+    }
+    const isSelected = selectedFiles.some((f) => f.id === file.id);
+    if (isSelected) {
+      onSelectFiles(selectedFiles.filter((f) => f.id !== file.id));
+    } else {
+      onSelectFiles([...selectedFiles, file]);
     }
   }
 
@@ -80,24 +196,6 @@ export function GoogleDriveFileBrowser({
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 
-  function getFileIcon(mimeType: string) {
-    if (isFolder(mimeType)) return <Folder className="h-5 w-5 text-blue-500" />;
-    if (mimeType.includes("document"))
-      return <FileText className="h-5 w-5 text-blue-600" />;
-    if (mimeType.includes("spreadsheet"))
-      return <Sheet className="h-5 w-5 text-green-600" />;
-    if (mimeType.includes("presentation"))
-      return <Presentation className="h-5 w-5 text-orange-600" />;
-    if (mimeType.startsWith("image"))
-      return <Image className="h-5 w-5 text-purple-600" />;
-    if (mimeType.startsWith("video"))
-      return <Video className="h-5 w-5 text-red-600" />;
-    if (mimeType.startsWith("audio"))
-      return <Music className="h-5 w-5 text-pink-600" />;
-    if (mimeType.includes("zip") || mimeType.includes("compressed"))
-      return <Archive className="h-5 w-5 text-yellow-600" />;
-    return <File className="h-5 w-5 text-gray-600" />;
-  }
   return (
     <div className="flex flex-col h-[500px]">
       <div className="p-4 border-b">
@@ -190,6 +288,16 @@ export function GoogleDriveFileBrowser({
           </div>
         )}
       </div>
+
+      {/* Selected Count */}
+      {selectedFiles.length > 0 && (
+        <div className="p-3 border-t bg-muted/30">
+          <p className="text-sm font-medium">
+            {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}{" "}
+            selected
+          </p>
+        </div>
+      )}
     </div>
   );
 }

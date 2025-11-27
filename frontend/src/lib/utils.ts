@@ -32,3 +32,20 @@ export function formatDate(date: string | Date | null | undefined): string {
     minute: "2-digit",
   }).format(d);
 }
+export function isFolder(mimeType: string): boolean {
+  return mimeType === "application/vnd.google-apps.folder";
+}
+
+export function getFileIcon(mimeType: string): string {
+  if (mimeType.startsWith("image/")) return "🖼️";
+  if (mimeType.startsWith("video/")) return "🎥";
+  if (mimeType.startsWith("audio/")) return "🎵";
+  if (mimeType.includes("pdf")) return "📄";
+  if (mimeType.includes("document") || mimeType.includes("word")) return "📝";
+  if (mimeType.includes("spreadsheet") || mimeType.includes("excel"))
+    return "📊";
+  if (mimeType.includes("presentation") || mimeType.includes("powerpoint"))
+    return "📽️";
+  if (mimeType.includes("zip") || mimeType.includes("compressed")) return "📦";
+  return "📄";
+}
