@@ -1,4 +1,5 @@
 .PHONY: help fe-install fe-dev fe-build fe-lint fe-preview fe-test fe-test-coverage \
+        be-install be-dev be-lint be-format be-check be-migrate \
         docker-up docker-down docker-build docker-logs docker-clean
 
 help:
@@ -12,6 +13,13 @@ help:
 	@echo "  make fe-preview        - Preview production build"
 	@echo "  make fe-test           - Run frontend tests"
 	@echo "  make fe-test-coverage  - Run frontend tests with coverage"
+	@echo ""
+	@echo "Backend:"
+	@echo "  make be-install        - Install backend dependencies with uv"
+	@echo "  make be-dev            - Start backend development server"
+	@echo "  make be-lint           - Run backend linter (ruff)"
+	@echo "  make be-format         - Format backend code (ruff)"
+	@echo "  make be-check          - Run linter and type checks"
 	@echo ""
 	@echo "Docker:"
 	@echo "  make docker-up         - Start all services with Docker Compose"
@@ -49,6 +57,26 @@ fe-test-coverage:
 	@echo "Running frontend tests with coverage..."
 	cd frontend && npm run test:coverage
 
+# Backend commands
+be-install:
+	@echo "Installing backend dependencies with uv..."
+	cd backend && uv sync
+
+be-dev:
+	@echo "Starting backend development server..."
+	cd backend && uv run uvicorn src.asgi:app --reload --host 0.0.0.0 --port 8000
+
+be-lint:
+	@echo "Running backend linter..."
+	cd backend && uv run ruff check .
+
+be-format:
+	@echo "Formatting backend code..."
+	cd backend && uv run ruff format .
+
+be-check:
+	@echo "Running backend checks..."
+	cd backend && uv run ruff check . && uv run ruff format --check .
 
 # Docker commands
 docker-up:
