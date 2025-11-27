@@ -7,6 +7,7 @@ import { ImportDialog } from "./ImportDialog";
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { useWorkspace } from "@/hooks/useWorkspaces";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,24 +43,17 @@ export default function FileList() {
   const setCurrentWorkspace = useWorkspaceStore(
     (state) => state.setCurrentWorkspace
   );
+  const { workspace } = useWorkspace(workspaceId ? Number(workspaceId) : 0);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.Grid);
   const [viewingFile, setViewingFile] = useState<DataRoomFile | null>(null);
 
-  // Set current workspace when component mounts or workspaceId changes
+  // Set current workspace when workspace data is loaded
   useEffect(() => {
-    if (workspaceId) {
-      setCurrentWorkspace({
-        id: Number(workspaceId),
-        name: "",
-        description: "",
-        createdAt: "",
-        updatedAt: "",
-        ownerId: 0,
-        members: [],
-      });
+    if (workspace) {
+      setCurrentWorkspace(workspace);
     }
-  }, [workspaceId, setCurrentWorkspace]);
+  }, [workspace, setCurrentWorkspace]);
 
   // Filter files based on search query
   const filteredFiles = useMemo(() => {
@@ -193,8 +187,7 @@ export default function FileList() {
                           <Eye className="mr-2 h-4 w-4" />
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDownload(file)}>
+                        <DropdownMenuItem onClick={() => handleDownload(file)}>
                           <Download className="mr-2 h-4 w-4" />
                           Download
                         </DropdownMenuItem>
