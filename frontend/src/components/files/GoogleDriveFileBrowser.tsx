@@ -1,6 +1,18 @@
 import type { GoogleDriveFile } from "@/lib/googleDrive";
 import { Button } from "../ui/button";
-import { ChevronRight, Home } from "lucide-react";
+import {
+  Archive,
+  ChevronRight,
+  FileText,
+  Home,
+  Music,
+  Presentation,
+  Sheet,
+  Video,
+  File,
+  Image,
+  Folder,
+} from "lucide-react";
 import { useState } from "react";
 
 interface GoogleDriveFileBrowserProps {
@@ -27,6 +39,10 @@ export function GoogleDriveFileBrowser({
   function handleBreadcrumbClick(index: number): void {
     throw new Error("Function not implemented.");
   }
+
+  const isFolder = (mimeType: string): boolean => {
+    return mimeType === "application/vnd.google-apps.folder";
+  };
 
   return (
     <div className="flex flex-col h-[500px]">
