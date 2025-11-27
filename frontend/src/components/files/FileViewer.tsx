@@ -25,7 +25,7 @@ interface FileViewerProps {
   workspaceId: number;
   fileId: number;
   fileName: string;
-  mimeType?: string;
+  mimeType?: string | null;
   onClose: () => void;
 }
 
