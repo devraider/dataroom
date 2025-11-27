@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import {
-  X,
   Download,
   Loader2,
   ChevronLeft,
@@ -155,13 +154,6 @@ export function FileViewer({
                 <span className="hidden sm:inline">
                   {isDownloading ? "Downloading..." : "Download"}
                 </span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="h-8 w-8 sm:h-10 sm:w-10">
-                <X className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
