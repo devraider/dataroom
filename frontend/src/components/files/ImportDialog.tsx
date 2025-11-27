@@ -21,10 +21,10 @@ import { QUERY_KEYS } from "@/lib/queryKeys";
 import { queryClient } from "@/lib/queryClient";
 import { fileService } from "@/services/fileService";
 import {
-  getExportedMimeType,
   getExportedFilename,
+  getExportedMimeType,
   isGoogleDocsFile,
-} from "@/lib/gooogle";
+} from "@/lib/googleDrive";
 
 interface ImportProgress {
   fileName: string;
