@@ -1,10 +1,10 @@
 import type { DataRoomFile } from "@/types/file";
 import apiClient from "@/lib/httpClient";
-import {
-  downloadGoogleDriveFile,
-  type GoogleDriveFile,
-} from "@/lib/googleDrive";
-import type { ImportGoogleDriveOptions } from "@/types/googleDrive";
+import type {
+  GoogleDriveFile,
+  ImportGoogleDriveOptions,
+} from "@/types/googleDrive";
+import { downloadGoogleDriveFile } from "@/lib/googleDrive";
 
 export const fileService = {
   getAll: async (workspaceId: number): Promise<DataRoomFile[]> => {
