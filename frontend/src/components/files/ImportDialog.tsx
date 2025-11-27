@@ -10,15 +10,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { ImportProgressStatus } from "@/types/enums";
+import { ImportProgressStatus } from "@/types/enums";
+import type { ImportProgressStatus as ImportProgressStatusType } from "@/types/enums";
 import { useGoogleDrive } from "@/hooks/useGoogleDrive";
 import { GoogleDriveFileBrowser } from "./GoogleDriveFileBrowser";
 import type { GoogleDriveFile } from "@/types/googleDrive";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { toast } from "sonner";
+import { QUERY_KEYS } from "@/lib/queryKeys";
+import { queryClient } from "@/lib/queryClient";
+import { fileService } from "@/services/fileService";
+import {
+  getExportedMimeType,
+  getExportedFilename,
+  isGoogleDocsFile,
+} from "@/lib/gooogle";
 
 interface ImportProgress {
   fileName: string;
-  status: ImportProgressStatus;
+  status: ImportProgressStatusType;
   error?: string;
 }
 
@@ -31,12 +41,108 @@ export function ImportDialog() {
   const [selectedFiles, setSelectedFiles] = useState<GoogleDriveFile[]>([]);
   const { currentWorkspace } = useWorkspaceStore();
 
+  function initializeImportProgress() {
+    setImportProgress(
+      selectedFiles.map((file) => ({
+        fileName: file.name,
+        status: ImportProgressStatus.PENDING,
+      }))
+    );
+  }
+
+  function updateFileProgress(
+    index: number,
+    status: ImportProgressStatusType,
+    error?: string
+  ) {
+    setImportProgress((prev) =>
+      prev.map((p, idx) =>
+        idx === index ? { ...p, status, ...(error && { error }) } : p
+      )
+    );
+  }
+
+  async function importSingleFile(
+    file: GoogleDriveFile,
+    index: number
+  ): Promise<boolean> {
+    const exportedName = getExportedFilename(file.name, file.mimeType);
+    const exportedMimeType = getExportedMimeType(file.mimeType);
+
+    updateFileProgress(index, ImportProgressStatus.UPLOADING);
+
+    try {
+      await fileService.importFromGoogleDrive(
+        currentWorkspace!.id,
+        file.id,
+        accessToken!,
+        {
+          name: exportedName,
+          mimeType: exportedMimeType,
+          originalMimeType: file.mimeType,
+          isGoogleDoc: isGoogleDocsFile(file.mimeType),
+        }
+      );
+
+      updateFileProgress(index, ImportProgressStatus.SUCCESS);
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Import failed";
+      updateFileProgress(index, ImportProgressStatus.ERROR, errorMessage);
+      return false;
+    }
+  }
+
+  function handleImportComplete(successCount: number, errorCount: number) {
+    if (errorCount === 0) {
+      toast.success(`Successfully imported ${successCount} file(s)`);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.files.all });
+      setTimeout(() => {
+        resetImportState();
+      }, 2000);
+    } else {
+      toast.warning(`Imported ${successCount} file(s), ${errorCount} failed`);
+      if (successCount > 0) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.files.all });
+      }
+    }
+  }
+
+  function resetImportState() {
+    setOpen(false);
+    setSelectedFiles([]);
+    setImportProgress([]);
+  }
+
   async function handleImport(): Promise<void> {
-    console.log("handleImport called", {
-      hasWorkspace: !!currentWorkspace,
-      hasToken: !!accessToken,
-      filesCount: selectedFiles.length,
-    });
+    if (!currentWorkspace || !accessToken || selectedFiles.length === 0) {
+      console.warn("Import blocked: Missing workspace, token, or files");
+      toast.error("Cannot import files at this time.");
+      return;
+    }
+
+    setIsImporting(true);
+    initializeImportProgress();
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const success = await importSingleFile(selectedFiles[i], i);
+        if (success) {
+          successCount++;
+        } else {
+          errorCount++;
+        }
+      }
+
+      handleImportComplete(successCount, errorCount);
+    } catch (err) {
+      toast.error("Failed to import files");
+    } finally {
+      setIsImporting(false);
+    }
   }
 
   return (
