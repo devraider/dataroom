@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -13,6 +14,7 @@ import type { ImportProgressStatus } from "@/types/enums";
 import { useGoogleDrive } from "@/hooks/useGoogleDrive";
 import { GoogleDriveFileBrowser } from "./GoogleDriveFileBrowser";
 import type { GoogleDriveFile } from "@/types/googleDrive";
+import { useWorkspaceStore } from "@/store/workspaceStore";
 
 interface ImportProgress {
   fileName: string;
@@ -27,6 +29,15 @@ export function ImportDialog() {
     useGoogleDrive();
   const [isImporting, setIsImporting] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<GoogleDriveFile[]>([]);
+  const { currentWorkspace } = useWorkspaceStore();
+
+  async function handleImport(): Promise<void> {
+    console.log("handleImport called", {
+      hasWorkspace: !!currentWorkspace,
+      hasToken: !!accessToken,
+      filesCount: selectedFiles.length,
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -129,6 +140,24 @@ export function ImportDialog() {
             </div>
           )}
         </div>
+
+        {isAuthenticated && !isImporting && importProgress.length === 0 && (
+          <DialogFooter className="p-6 pt-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+                setSelectedFiles([]);
+              }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleImport}
+              disabled={selectedFiles.length === 0}>
+              Import {selectedFiles.length > 0 && `(${selectedFiles.length})`}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
