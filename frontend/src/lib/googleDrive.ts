@@ -10,10 +10,10 @@ export const GOOGLE_TO_MS_MIME_TYPES: Record<string, string> = {
     "application/vnd.openxmlformats-officedocument.presentationml.presentation", // Google Slides -> .pptx
 };
 
-export const downloadGoogleDriveFile = async (
+export async function downloadGoogleDriveFile(
   file: GoogleDriveFile,
   accessToken: string
-): Promise<Blob> => {
+): Promise<Blob> {
   const isGoogleDoc = file.mimeType.startsWith("application/vnd.google-apps.");
 
   let url: string;
@@ -40,4 +40,4 @@ export const downloadGoogleDriveFile = async (
   }
 
   return await response.blob();
-};
+}
