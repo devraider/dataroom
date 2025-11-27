@@ -50,3 +50,19 @@ export function getFileIcon(mimeType: string | null | undefined): string {
     return "📦";
   return "📄";
 }
+
+export function getFileType(mimeType?: string | null) {
+  if (!mimeType)
+    return { isPdf: false, isImage: false, isText: false, isOfficeDoc: false };
+
+  return {
+    isPdf: mimeType === "application/pdf",
+    isImage: mimeType.startsWith("image/"),
+    isText: mimeType.startsWith("text/"),
+    isOfficeDoc:
+      mimeType.includes("officedocument") ||
+      mimeType.includes("msword") ||
+      mimeType.includes("ms-excel") ||
+      mimeType.includes("ms-powerpoint"),
+  };
+}
