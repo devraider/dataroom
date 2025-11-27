@@ -1,4 +1,3 @@
-import type { GoogleDriveFile } from "@/lib/googleDrive";
 import { cn, getFileIcon, isFolder } from "@/lib/utils";
 import {
   Check,
@@ -11,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import type { GoogleDriveFile } from "@/types/googleDrive";
 
 interface GoogleDriveFileBrowserProps {
   accessToken: string;
