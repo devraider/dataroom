@@ -4,3 +4,14 @@ export interface ImportGoogleDriveOptions {
   originalMimeType: string;
   isGoogleDoc: boolean;
 }
+
+export interface GoogleDriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  size?: number;
+  thumbnailLink?: string;
+  webViewLink?: string;
+  modifiedTime?: string;
+  iconLink?: string;
+}
