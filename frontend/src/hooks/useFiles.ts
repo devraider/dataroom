@@ -6,7 +6,7 @@ export const useFiles = (workspaceId: number) => {
   const queryClient = useQueryClient();
 
   const filesQuery = useQuery({
-    queryKey: QUERY_KEYS.files.all,
+    queryKey: QUERY_KEYS.files.all(workspaceId),
     queryFn: () => fileService.getAll(workspaceId),
     staleTime: 30000,
     enabled: !!workspaceId,
@@ -15,7 +15,9 @@ export const useFiles = (workspaceId: number) => {
   const deleteMutation = useMutation({
     mutationFn: (fileId: number) => fileService.delete(workspaceId, fileId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.files.all });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.files.all(workspaceId),
+      });
     },
   });
 
@@ -41,7 +43,7 @@ export const useFiles = (workspaceId: number) => {
 
 export const useFile = (workspaceId: number, id: number) => {
   const fileQuery = useQuery({
-    queryKey: QUERY_KEYS.files.detail(id),
+    queryKey: QUERY_KEYS.files.detail(workspaceId, id),
     queryFn: () => fileService.getById(workspaceId, id),
     enabled: !!id && !!workspaceId,
     staleTime: 30000,

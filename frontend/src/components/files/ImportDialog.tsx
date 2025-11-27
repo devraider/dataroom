@@ -96,14 +96,18 @@ export function ImportDialog() {
   function handleImportComplete(successCount: number, errorCount: number) {
     if (errorCount === 0) {
       toast.success(`Successfully imported ${successCount} file(s)`);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.files.all });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.files.all(currentWorkspace!.id),
+      });
       setTimeout(() => {
         resetImportState();
       }, 2000);
     } else {
       toast.warning(`Imported ${successCount} file(s), ${errorCount} failed`);
       if (successCount > 0) {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.files.all });
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.files.all(currentWorkspace!.id),
+        });
       }
     }
   }
