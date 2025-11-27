@@ -2,13 +2,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "../types/auth";
 import { StorageKey } from "../types/enums";
+import { authService } from "../services/authService";
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   setAuth: (user: User, token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -18,7 +19,16 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
-      logout: () => set({ user: null, token: null, isAuthenticated: false }),
+      logout: async () => {
+        try {
+          await authService.logout();
+        } catch (error) {
+          console.error("Logout error:", error);
+          // Continue with local logout even if backend call fails
+        } finally {
+          set({ user: null, token: null, isAuthenticated: false });
+        }
+      },
     }),
     {
       name: StorageKey.AUTH,

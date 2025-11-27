@@ -14,8 +14,8 @@ export default function Header() {
   const isInWorkspace = location.pathname.includes("/files");
   const currentWorkspace = useWorkspaceStore((state) => state.currentWorkspace);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 
