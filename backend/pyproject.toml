@@ -15,4 +15,5 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "google-auth>=2.23.0",
     "httpx>=0.25.0",
+    "pytest>=9.0.1",
 ]
