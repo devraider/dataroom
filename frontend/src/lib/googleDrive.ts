@@ -10,6 +10,13 @@ export const GOOGLE_TO_MS_MIME_TYPES: Record<string, string> = {
     "application/vnd.openxmlformats-officedocument.presentationml.presentation", // Google Slides -> .pptx
 };
 
+// File extensions for Microsoft formats
+export const GOOGLE_TO_MS_EXTENSIONS: Record<string, string> = {
+  "application/vnd.google-apps.document": ".docx",
+  "application/vnd.google-apps.spreadsheet": ".xlsx",
+  "application/vnd.google-apps.presentation": ".pptx",
+};
+
 export async function downloadGoogleDriveFile(
   file: GoogleDriveFile,
   accessToken: string
@@ -40,4 +47,28 @@ export async function downloadGoogleDriveFile(
   }
 
   return await response.blob();
+}
+
+export function isGoogleDocsFile(mimeType: string): boolean {
+  return mimeType.startsWith("application/vnd.google-apps.");
+}
+
+export function getExportedMimeType(mimeType: string): string {
+  if (isGoogleDocsFile(mimeType)) {
+    return GOOGLE_TO_MS_MIME_TYPES[mimeType] || "application/pdf";
+  }
+  return mimeType;
+}
+
+export function getExportedFilename(
+  originalName: string,
+  mimeType: string
+): string {
+  if (isGoogleDocsFile(mimeType)) {
+    const extension = GOOGLE_TO_MS_EXTENSIONS[mimeType] || ".pdf";
+    // Remove any existing Google Docs extension and add Microsoft extension
+    const nameWithoutExt = originalName.replace(/\.[^/.]+$/, "");
+    return `${nameWithoutExt}${extension}`;
+  }
+  return originalName;
 }
