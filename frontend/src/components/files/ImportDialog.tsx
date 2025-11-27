@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertCircle, Loader2, Upload } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -89,6 +89,44 @@ export function ImportDialog() {
                 />
               )}
             </>
+          )}
+
+          {importProgress.length > 0 && (
+            <div className="p-6">
+              <h4 className="text-sm font-medium mb-4">Import Progress</h4>
+              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                {importProgress.map((progress, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 bg-secondary/50 rounded-md">
+                    <span className="text-sm truncate flex-1">
+                      {progress.fileName}
+                    </span>
+                    <div className="flex items-center gap-2 ml-4">
+                      {progress.status === "pending" && (
+                        <span className="text-xs text-muted-foreground">
+                          Pending
+                        </span>
+                      )}
+                      {progress.status === "uploading" && (
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      )}
+                      {progress.status === "success" && (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      )}
+                      {progress.status === "error" && (
+                        <div className="flex items-center gap-1">
+                          <AlertCircle className="h-4 w-4 text-destructive" />
+                          <span className="text-xs text-destructive">
+                            {progress.error || "Failed"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </DialogContent>
