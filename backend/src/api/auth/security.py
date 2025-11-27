@@ -4,15 +4,32 @@ import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
-from sqlmodel import Session
+from sqlmodel import Session, select
 from starlette import status
 
 from backend.src.config.settings import app_settings
 from backend.src.database.session import get_session
 from backend.src.models.user import User
+from backend.src.models.token_blacklist import TokenBlacklist
 
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECURITY = HTTPBearer()
+
+
+def is_token_blacklisted(token: str, session: Session) -> bool:
+    """Check if token is blacklisted
+    
+    Args:
+        token: JWT token to check
+        session: Database session
+        
+    Returns:
+        bool: True if token is blacklisted
+    """
+    blacklisted = session.exec(
+        select(TokenBlacklist).where(TokenBlacklist.token == token)
+    ).first()
+    return blacklisted is not None
 
 
 
@@ -77,6 +94,15 @@ async def get_current_user(
     )
 
     token = credentials.credentials
+    
+    # Check if token is blacklisted
+    if is_token_blacklisted(token, session):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been revoked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     payload = verify_token(token)
 
     if payload is None:
