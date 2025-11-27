@@ -3,12 +3,14 @@ from datetime import timedelta
 import httpx
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session, select
 
 from backend.src.api.auth.security import get_current_user
 from backend.src.config.settings import app_settings
 from backend.src.database.session import get_session
 from backend.src.models.user import User
+from backend.src.models.token_blacklist import TokenBlacklist
 from backend.src.schemas.auth import (
     GoogleLoginRequest,
     GoogleLoginResponse,
@@ -19,6 +21,7 @@ from backend.src.types.date import utc_now
 from backend.src.types.roles import RoleEnum
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
+SECURITY = HTTPBearer()
 
 
 @auth_router.post("/google", response_model=TokenResponse)
@@ -133,3 +136,55 @@ async def get_me(current_user: User = Depends(get_current_user)) -> User:
         dict: User information
     """
     return current_user
+
+
+@auth_router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(SECURITY),
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+) -> None:
+    """Logout user by blacklisting their current token
+    
+    Args:
+        credentials: HTTP Authorization credentials with Bearer token
+        current_user: Current authenticated user
+        session: Database session
+        
+    Returns:
+        None
+    """
+    token = credentials.credentials
+    
+    # Decode token to get expiration time
+    try:
+        payload = jwt.decode(
+            token,
+            app_settings.SECRET_KEY.get_secret_value(),
+            algorithms=[app_settings.ALGORITHM]
+        )
+        exp_timestamp = payload.get("exp")
+        
+        if exp_timestamp:
+            import datetime as dt
+            expires_at = dt.datetime.fromtimestamp(exp_timestamp, tz=dt.timezone.utc)
+        else:
+            # Default to current time + token expiry if exp not in token
+            expires_at = utc_now() + timedelta(minutes=app_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    
+    # Add token to blacklist
+    blacklisted_token = TokenBlacklist(
+        token=token,
+        user_id=current_user.id,
+        expires_at=expires_at,
+    )
+    session.add(blacklisted_token)
+    session.commit()
+    
+    return None
