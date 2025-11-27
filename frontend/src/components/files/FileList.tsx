@@ -5,15 +5,70 @@ import { useFiles } from "@/hooks/useFiles";
 import { EmptyState } from "../common/EmptyState";
 import { ImportDialog } from "./ImportDialog";
 import { useParams } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { useWorkspaceStore } from "@/store/workspaceStore";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Search,
+  Grid3x3,
+  List,
+  MoreVertical,
+  Eye,
+  Download,
+  Trash2,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { formatDate, formatBytes, getFileIcon } from "@/lib/utils";
+import apiClient from "@/lib/httpClient";
+import { FileViewer } from "./FileViewer";
+
+enum ViewMode {
+  Grid = "grid",
+  List = "list",
+}
 
 export default function FileList() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const { files, isLoading, deleteFile } = useFiles(
     workspaceId ? Number(workspaceId) : 0
   );
+  const setCurrentWorkspace = useWorkspaceStore(
+    (state) => state.setCurrentWorkspace
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.Grid);
+  const [viewingFile, setViewingFile] = useState<DataRoomFile | null>(null);
 
-  function handleView(file: DataRoomFile) {
-    console.log("View file:", file);
+  // Set current workspace when component mounts or workspaceId changes
+  useEffect(() => {
+    if (workspaceId) {
+      setCurrentWorkspace({
+        id: Number(workspaceId),
+        name: "",
+        description: "",
+        createdAt: "",
+        updatedAt: "",
+        ownerId: 0,
+        members: [],
+      });
+    }
+  }, [workspaceId, setCurrentWorkspace]);
+
+  // Filter files based on search query
+  const filteredFiles = useMemo(() => {
+    if (!searchQuery.trim()) return files;
+    const query = searchQuery.toLowerCase();
+    return files.filter((file) => file.name.toLowerCase().includes(query));
+  }, [files, searchQuery]);
+
+  async function handleView(file: DataRoomFile) {
+    setViewingFile(file);
   }
 
   function handleDelete(fileId: number) {
@@ -22,9 +77,10 @@ export default function FileList() {
     }
   }
 
-  function handleDownload(fileId: number) {
-    console.log("Download file:", fileId);
+  async function handleDownload(fileId: number) {
+    console.log("Download file with ID:", fileId);
   }
+
   if (isLoading) {
     return <LoadingSpinner text="Loading files..." />;
   }
@@ -34,31 +90,133 @@ export default function FileList() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">My Files</h2>
-          <p className="text-muted-foreground">{files.length} file(s)</p>
+          <p className="text-muted-foreground">
+            {filteredFiles.length} file(s)
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {files.length > 0 && <ImportDialog />}
+        <div className="flex items-center border rounded-md p-2 gap-4">
+          {files.length > 0 && (
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search files..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              <div className="flex items-center gap-1 border rounded-md p-1">
+                <Button
+                  variant={viewMode === ViewMode.Grid ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode(ViewMode.Grid)}
+                  className="h-8 w-8 p-0">
+                  <Grid3x3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === ViewMode.List ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode(ViewMode.List)}
+                  className="h-8 w-8 p-0">
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+              <ImportDialog />
+            </div>
+          )}
         </div>
       </div>
 
-      {files.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {files.map((file) => (
-            <FileCard
-              key={file.id}
-              file={file}
-              onView={handleView}
-              onDelete={handleDelete}
-              onDownload={handleDownload}
+      <div className="p-6">
+        {files.length > 0 ? (
+          filteredFiles.length > 0 ? (
+            viewMode === "grid" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredFiles.map((file) => (
+                  <FileCard
+                    key={file.id}
+                    file={file}
+                    onView={handleView}
+                    onDelete={handleDelete}
+                    onDownload={handleDownload}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y">
+                {filteredFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0 hover:bg-muted/50 px-2 -mx-2 rounded transition-colors">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="text-2xl">
+                        {getFileIcon(file.mimeType)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium truncate">{file.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {formatBytes(file.size)} •{" "}
+                          {formatDate(file.modifiedAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleView(file)}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDownload(file.id)}>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(file.id)}
+                          className="text-destructive">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            <EmptyState
+              title="No files found"
+              description="Try adjusting your search query"
             />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          title="No files yet"
-          description="Import files from Google Drive to get started"
-          action={<ImportDialog />}
+          )
+        ) : (
+          <EmptyState
+            title="No files yet"
+            description="Import files from Google Drive to get started"
+            action={<ImportDialog />}
+          />
+        )}
+      </div>
+
+      {viewingFile && workspaceId && (
+        <FileViewer
+          workspaceId={Number(workspaceId)}
+          fileId={viewingFile.id}
+          fileName={viewingFile.name}
+          mimeType={viewingFile.mimeType}
+          onClose={() => setViewingFile(null)}
         />
       )}
     </div>
