@@ -68,14 +68,4 @@ export const fileService = {
 
     return data;
   },
-
-  fileDownload: async (workspaceId: number, id: number): Promise<Blob> => {
-    const { data } = await apiClient.get<Blob>(
-      `/workspaces/${workspaceId}/files/${id}/download`,
-      {
-        responseType: "blob",
-      }
-    );
-    return data;
-  },
 };
