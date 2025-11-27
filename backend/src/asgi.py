@@ -9,7 +9,6 @@ from backend.src.api.routes.workspace import workspace_router
 from backend.src.config.settings import app_settings
 from backend.src.database.session import create_db_and_tables, engine
 
-from backend.src.models import file, user, workspace
 from backend.src.models.token_blacklist import TokenBlacklist
 from backend.src.types.date import utc_now
 
