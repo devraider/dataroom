@@ -25,8 +25,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatDate, formatBytes, getFileIcon } from "@/lib/utils";
-import apiClient from "@/lib/httpClient";
 import { FileViewer } from "./FileViewer";
+import { fileService } from "@/services/fileService";
+import { toast } from "sonner";
 
 enum ViewMode {
   Grid = "grid",
@@ -78,7 +79,21 @@ export default function FileList() {
   }
 
   async function handleDownload(fileId: number) {
-    console.log("Download file with ID:", fileId);
+    if (!workspaceId) return;
+
+    try {
+      const blob = await fileService.fileDownload(Number(workspaceId), fileId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error("Failed to download file.");
+    }
   }
 
   if (isLoading) {
