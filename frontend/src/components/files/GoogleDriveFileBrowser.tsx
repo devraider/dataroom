@@ -12,8 +12,10 @@ import {
   File,
   Image,
   Folder,
+  Search,
 } from "lucide-react";
 import { useState } from "react";
+import { Input } from "../ui/input";
 
 interface GoogleDriveFileBrowserProps {
   accessToken: string;
@@ -35,6 +37,7 @@ export function GoogleDriveFileBrowser({
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
     { id: "root", name: "My Drive" },
   ]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   function handleBreadcrumbClick(index: number): void {
     throw new Error("Function not implemented.");
@@ -64,6 +67,19 @@ export function GoogleDriveFileBrowser({
   }
   return (
     <div className="flex flex-col h-[500px]">
+      <div className="p-4 border-b">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search Google Drive..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      </div>
+
       {/* Breadcrumbs */}
       {!isSearching && (
         <div className="px-4 py-2 border-b bg-muted/30">
