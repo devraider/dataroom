@@ -158,6 +158,19 @@ export function ImportDialog() {
             </Button>
           </DialogFooter>
         )}
+
+        {!isImporting && importProgress.length > 0 && (
+          <DialogFooter className="p-6 pt-0">
+            <Button
+              onClick={() => {
+                setImportProgress([]);
+                setSelectedFiles([]);
+                setOpen(false);
+              }}>
+              Close
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
