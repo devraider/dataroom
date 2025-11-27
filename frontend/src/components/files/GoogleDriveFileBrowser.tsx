@@ -40,9 +40,9 @@ export function GoogleDriveFileBrowser({
     throw new Error("Function not implemented.");
   }
 
-  const isFolder = (mimeType: string): boolean => {
+  function isFolder(mimeType: string): boolean {
     return mimeType === "application/vnd.google-apps.folder";
-  };
+  }
 
   return (
     <div className="flex flex-col h-[500px]">
