@@ -74,7 +74,7 @@ jobs:
         run: uv sync
 
       - name: Run tests
-        run: uv run pytest
+        run: PYTHONPATH=.. uv run pytest
         env:
           POSTGRES_HOST: localhost
           POSTGRES_USER: test_user
@@ -82,6 +82,7 @@ jobs:
           POSTGRES_DATABASE: test_db
           POSTGRES_PORT: 5432
           SECRET_KEY: test-secret-key-for-ci
+          GOOGLE_CLIENT_ID: test-google-client-id
           DEBUG: "True"
 
   frontend-lint:
@@ -98,8 +99,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
@@ -126,8 +127,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
