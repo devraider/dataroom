@@ -112,9 +112,35 @@ Data Room provides organizations a robust platform to securely store, organize, 
 
 ### 1. Backend Commands
 
+```bash
+make be-install        # Install dependencies with uv
+make be-dev            # Start development server with hot reload
+make be-lint           # Run linter (ruff)
+make be-format         # Format code (ruff)
+make be-check          # Run all checks
+```
+
 ### 2. Frontend Commands
 
+```bash
+make fe-install        # Install dependencies
+make fe-dev            # Start development server
+make fe-build          # Build for production
+make fe-lint           # Run linter
+make fe-preview        # Preview production build
+make fe-test           # Run tests
+make fe-test-coverage  # Run tests with coverage
+```
+
 ### 3. Docker Commands
+
+```bash
+make docker-up         # Start all services
+make docker-down       # Stop all services
+make docker-build      # Build Docker images
+make docker-logs       # View logs
+make docker-clean      # Remove containers, volumes, and images
+```
 
 ## Configuration
 
