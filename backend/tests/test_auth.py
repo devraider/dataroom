@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -11,7 +11,7 @@ from backend.src.models.user import User
 
 
 @pytest.fixture(autouse=True)
-def mock_httpx_client() -> Generator[MagicMock, None, None]:
+def mock_httpx_client() -> Generator[tuple[MagicMock | AsyncMock, MagicMock]]:
     """Automatically mock httpx.AsyncClient for all tests."""
     with patch("httpx.AsyncClient") as mock_client_class:
         # Default success response

@@ -1,5 +1,6 @@
-import pytest
 from collections.abc import Generator
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
@@ -9,7 +10,7 @@ from backend.src.database.session import get_session
 
 
 @pytest.fixture(name="session")
-def session_fixture() -> Generator[Session, None, None]:
+def session_fixture() -> Generator[Session]:
     """Create a fresh database session for each test."""
     engine = create_engine(
         "sqlite:///:memory:",
@@ -22,7 +23,7 @@ def session_fixture() -> Generator[Session, None, None]:
 
 
 @pytest.fixture(name="client")
-def client_fixture(session: Session) -> Generator[TestClient, None, None]:
+def client_fixture(session: Session) -> Generator[TestClient]:
     """Create a test client with a test database session."""
 
     def get_session_override():
