@@ -26,6 +26,12 @@ Data Room provides organizations a robust platform to securely store, organize, 
 
 ## Prerequisites
 
+- [Docker](https://www.docker.com/) and Docker Compose
+- [Python](https://www.python.org/) 3.13 with [uv](https://github.com/astral-sh/uv)
+- [Node.js](https://nodejs.org/) 18+ (for local frontend development)
+- [Make](https://www.gnu.org/software/make/) (optional, for convenience commands)
+- [dbBeaver](https://dbeaver.io/) or any PostgreSQL client (optional, for database management)
+
 ## Quick Start Guide
 
 ### 1. Using Docker (Recommended)
