@@ -1,5 +1,5 @@
-.PHONY: help fe-install fe-dev fe-build fe-lint fe-preview fe-test fe-test-coverage \
-        be-install be-dev be-lint be-format be-check be-migrate \
+.PHONY: help fe-install fe-dev fe-build fe-lint fe-type-check fe-preview fe-test fe-test-coverage \
+        be-install be-dev be-lint be-format be-check be-test be-test-coverage \
         docker-up docker-down docker-build docker-logs docker-clean
 
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "  make fe-dev            - Start frontend development server"
 	@echo "  make fe-build          - Build frontend for production"
 	@echo "  make fe-lint           - Run frontend linter"
+	@echo "  make fe-type-check     - Run TypeScript type checking"
 	@echo "  make fe-preview        - Preview production build"
 	@echo "  make fe-test           - Run frontend tests"
 	@echo "  make fe-test-coverage  - Run frontend tests with coverage"
@@ -20,6 +21,9 @@ help:
 	@echo "  make be-lint           - Run backend linter (ruff)"
 	@echo "  make be-format         - Format backend code (ruff)"
 	@echo "  make be-check          - Run linter and type checks"
+	@echo "  make be-test           - Run backend tests"
+	@echo "  make be-test           - Run backend tests"
+	@echo "  make be-test-coverage  - Run backend tests with coverage"
 	@echo ""
 	@echo "Docker:"
 	@echo "  make docker-up         - Start all services with Docker Compose"
@@ -44,6 +48,10 @@ fe-build:
 fe-lint:
 	@echo "Running frontend linter..."
 	cd frontend && npm run lint
+
+fe-type-check:
+	@echo "Running TypeScript type checking..."
+	cd frontend && npm run type-check
 
 fe-preview:
 	@echo "Previewing production build..."
@@ -77,6 +85,14 @@ be-format:
 be-check:
 	@echo "Running backend checks..."
 	cd backend && uv run ruff check . && uv run ruff format --check .
+
+be-test:
+	@echo "Running backend tests..."
+	cd backend && PYTHONPATH=.. uv run pytest
+
+be-test-coverage:
+	@echo "Running backend tests with coverage..."
+	cd backend && PYTHONPATH=.. uv run pytest --cov=src --cov-report=term-missing
 
 # Docker commands
 docker-up:
