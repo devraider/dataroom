@@ -227,9 +227,33 @@ npm run test:coverage    # Run with coverage
 
 ## Deployment
 
+1. **Build Docker images**
+
+   ```bash
+   make docker-build
+   ```
+
+2. **Configure production environment**
+
+   - Update `backend/.env` with production secrets
+   - Update `frontend/.env` with production API URL
+   - Set `DEBUG=False` in backend
+
+3. **Deploy with Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
 ## API Documentation
 
+Once the backend is running, visit:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
 ## License
+
+This project is licensed under the MIT License.
 
 ## Links
 
