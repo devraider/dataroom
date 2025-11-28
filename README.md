@@ -144,6 +144,24 @@ make docker-clean      # Remove containers, volumes, and images
 
 ## Configuration
 
+### Backend Environment Variables
+
+See `backend/.env.example` for all available options:
+
+- `SECRET_KEY` - JWT secret (change in production!)
+- `POSTGRES_*` - Database configuration
+- `HOST` & `PORT` - Server configuration
+- `GOOGLE_CLIENT_ID` - OAuth configuration
+- `ALLOWED_ORIGINS` - CORS settings
+
+### Frontend Environment Variables
+
+See `frontend/.env.example` for all available options:
+
+- `VITE_MODE` - Application mode (demo/development/production)
+- `VITE_API_URL` - Backend API URL
+- `VITE_GOOGLE_CLIENT_ID` - Google OAuth configuration
+
 ## Project Structure
 
 ## Testing
