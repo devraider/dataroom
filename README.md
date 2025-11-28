@@ -7,7 +7,22 @@ Data Room provides organizations a robust platform to securely store, organize, 
 
 ### 1. Backend
 
+- **Python 3.13** with [uv](https://github.com/astral-sh/uv) for fast package management
+- **FastAPI** - Modern and high-performance web framework
+- **SQLModel** - SQL databases with Python type safety based on SQLAlchemy and Pydantic
+- **PostgreSQL** - Relational database
+- **Google OAuth 2.0** for secure third-party authentication
+- **JWT** - Secure authentication
+- **Ruff** - Fast Python linter and formatter
+
 ### 2. Frontend
+
+- **React 19** with TypeScript
+- **Vite** - Frontend tooling and webpack alternative
+- **TanStack Query** - Powerful data synchronization
+- **Zustand** - Lightweight state management
+- **Tailwind CSS** - Utility-first styling
+- **shadcn/ui** - Beautiful, accessible components
 
 ## Prerequisites
 
