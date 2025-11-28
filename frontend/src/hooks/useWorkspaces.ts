@@ -22,10 +22,10 @@ export const useWorkspaces = () => {
         description: "Your new workspace has been created successfully.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { detail?: string } } };
       toast.error("Creation failed", {
-        description:
-          error.response?.data?.detail || "Failed to create workspace",
+        description: err.response?.data?.detail || "Failed to create workspace",
       });
     },
   });
@@ -39,10 +39,10 @@ export const useWorkspaces = () => {
         description: "Your workspace has been updated successfully.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { detail?: string } } };
       toast.error("Update failed", {
-        description:
-          error.response?.data?.detail || "Failed to update workspace",
+        description: err.response?.data?.detail || "Failed to update workspace",
       });
     },
   });
@@ -55,10 +55,10 @@ export const useWorkspaces = () => {
         description: "The workspace has been successfully deleted.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { detail?: string } } };
       toast.error("Delete failed", {
-        description:
-          error.response?.data?.detail || "Failed to delete workspace",
+        description: err.response?.data?.detail || "Failed to delete workspace",
       });
     },
   });
@@ -77,9 +77,10 @@ export const useWorkspaces = () => {
         description: "New member has been added to the workspace.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { detail?: string } } };
       toast.error("Failed to add member", {
-        description: error.response?.data?.detail || "Could not add member",
+        description: err.response?.data?.detail || "Could not add member",
       });
     },
   });
@@ -98,9 +99,10 @@ export const useWorkspaces = () => {
         description: "Member has been removed from the workspace.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { detail?: string } } };
       toast.error("Failed to remove member", {
-        description: error.response?.data?.detail || "Could not remove member",
+        description: err.response?.data?.detail || "Could not remove member",
       });
     },
   });
@@ -121,9 +123,10 @@ export const useWorkspaces = () => {
         description: "Member role has been updated successfully.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { detail?: string } } };
       toast.error("Failed to update role", {
-        description: error.response?.data?.detail || "Could not update role",
+        description: err.response?.data?.detail || "Could not update role",
       });
     },
   });

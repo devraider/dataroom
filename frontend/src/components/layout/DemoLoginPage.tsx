@@ -27,7 +27,7 @@ export default function DemoLoginPage() {
       });
 
       navigate("/workspaces");
-    } catch (error: any) {
+    } catch {
       toast.error("Login failed", {
         description: "Demo login failed",
       });

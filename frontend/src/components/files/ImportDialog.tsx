@@ -153,7 +153,7 @@ export function ImportDialog() {
       }
 
       handleImportComplete(successCount, errorCount);
-    } catch (err) {
+    } catch {
       toast.error("Failed to import files");
     } finally {
       setIsImporting(false);

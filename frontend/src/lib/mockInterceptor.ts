@@ -146,7 +146,7 @@ export const setupMockInterceptor = (axiosInstance: AxiosInstance) => {
           const idMatch = url.match(/\/files\/(\d+)$/);
           if (idMatch && Array.isArray(data)) {
             const id = parseInt(idMatch[1]);
-            const item = data.find((item: any) => item.id === id);
+            const item = data.find((item: { id: number }) => item.id === id);
 
             // Create a mock response
             config.adapter = () => {

@@ -97,7 +97,7 @@ export default function FileList() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
       toast.error("Failed to download file.");
     }
   }

@@ -31,7 +31,8 @@ export default function CreateWorkspaceDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await createWorkspace({ owner: user?.id!, name, description });
+    if (!user?.id) return;
+    await createWorkspace({ owner: user.id, name, description });
     setName("");
     setDescription("");
     onOpenChange(false);

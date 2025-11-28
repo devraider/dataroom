@@ -16,7 +16,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
 
-  const handleSuccess = async (credentialResponse: any) => {
+  const handleSuccess = async (credentialResponse: { credential?: string }) => {
     try {
       if (!credentialResponse.credential) {
         throw new Error("No credential received");
@@ -33,10 +33,11 @@ export default function LoginPage() {
       });
 
       navigate("/workspaces");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       toast.error("Login failed", {
         description:
-          error.response?.data?.message || "Failed to authenticate with Google",
+          err.response?.data?.message || "Failed to authenticate with Google",
       });
     }
   };

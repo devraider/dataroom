@@ -73,15 +73,7 @@ export function FileViewer({
         window.URL.revokeObjectURL(blobUrl);
       }
     };
-  }, [fetchFile]);
-
-  useEffect(() => {
-    return () => {
-      if (blobUrl) {
-        window.URL.revokeObjectURL(blobUrl);
-      }
-    };
-  }, [blobUrl]);
+  }, [fetchFile, blobUrl]);
 
   useEffect(() => {
     if (!isPdf || numPages <= 1) return;
