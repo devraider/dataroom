@@ -204,6 +204,27 @@ data-room/
 
 ## Testing
 
+### Backend
+
+```bash
+make be-test                 # Run tests
+make be-test-coverage        # Run tests with coverage
+# or directly
+cd backend
+uv run pytest
+```
+
+### Frontend
+
+```bash
+make fe-test                 # Run tests
+make fe-test-coverage        # Run tests with coverage
+# or directly
+cd frontend
+npm test                 # Run tests
+npm run test:coverage    # Run with coverage
+```
+
 ## Deployment
 
 ## API Documentation
