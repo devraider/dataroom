@@ -164,6 +164,44 @@ See `frontend/.env.example` for all available options:
 
 ## Project Structure
 
+```
+data-room/
+├── backend/
+│   ├── src/
+│   │   ├── api/           # API routes
+│   │   │   ├── auth/          # Authentication and authorization
+│   │   ├── config/        # Configuration
+│   │   ├── database/      # Database setup
+│   │   ├── models/        # SQLModel models
+│   │   ├── schemas/       # Pydantic schemas
+│   │   ├── services/      # Business logic
+│   │   ├── types/         # Custom types
+│   │   └── asgi.py        # FastAPI application
+│   ├── pyproject.toml     # Python dependencies
+│   ├── uv.lock            # Locked dependencies
+│   └── Dockerfile         # Backend container
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   │   ├── auth/          # Authentication and authorization
+│   │   │   ├── files/         # File management components
+│   │   │   ├── workspaces/    # Workspace management components
+│   │   │   ├── common/        # Common/shared components
+│   │   │   ├── layouts/       # Layout components
+│   │   │   └── ui/            # Shared UI components - created with shadcn/ui
+│   │   ├── hooks/         # Custom hooks
+│   │   ├── lib/           # Utilities
+│   │   ├── services/      # API services
+│   │   ├── store/         # State management
+│   │   └── types/         # TypeScript types
+│   ├── package.json       # Node dependencies
+│   └── Dockerfile         # Frontend container
+│
+├── docker-compose.yaml    # Docker orchestration
+└── Makefile              # Convenience commands
+```
+
 ## Testing
 
 ## Deployment
