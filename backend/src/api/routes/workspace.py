@@ -1,4 +1,3 @@
-
 import shutil
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -21,11 +20,7 @@ from backend.src.types.roles import RoleEnum
 workspace_router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 
 # Include files subrouter
-workspace_router.include_router(
-    files_router,
-    prefix="/{workspace_id}/files",
-    tags=["files"]
-)
+workspace_router.include_router(files_router, prefix="/{workspace_id}/files", tags=["files"])
 
 
 @workspace_router.get("/", response_model=list[WorkspaceResponse])
@@ -53,7 +48,7 @@ def get_workspaces(
                 email=member.user.email,
                 name=member.user.full_name,
                 picture=member.user.google_picture,
-                role=member.role
+                role=member.role,
             )
             for member in workspace.members
         ]
@@ -65,10 +60,10 @@ def get_workspaces(
                 created_at=workspace.created_at,
                 updated_at=workspace.updated_at,
                 created_by=workspace.created_by,
-                members=members
+                members=members,
             )
         )
-    
+
     return response
 
 
@@ -81,9 +76,7 @@ def create_workspace(
     """Create a new workspace and add the current user as admin"""
 
     new_workspace = Workspace(
-        name=workspace.name,
-        description=workspace.description,
-        created_by=current_user.id
+        name=workspace.name, description=workspace.description, created_by=current_user.id
     )
     session.add(new_workspace)
     session.commit()
@@ -91,9 +84,7 @@ def create_workspace(
 
     # Add creator as ADMIN member
     workspace_member = WorkspaceMember(
-        workspace_id=new_workspace.id,
-        user_id=current_user.id,
-        role=RoleEnum.ADMIN
+        workspace_id=new_workspace.id, user_id=current_user.id, role=RoleEnum.ADMIN
     )
     session.add(workspace_member)
     session.commit()
@@ -112,9 +103,9 @@ def create_workspace(
                 email=current_user.email,
                 name=current_user.full_name,
                 picture=current_user.google_picture,
-                role=RoleEnum.ADMIN
+                role=RoleEnum.ADMIN,
             )
-        ]
+        ],
     )
 
 
@@ -142,7 +133,7 @@ def update_workspace(
             email=member.user.email,
             name=member.user.full_name,
             picture=member.user.google_picture,
-            role=member.role
+            role=member.role,
         )
         for member in existing_workspace.members
     ]
@@ -154,7 +145,7 @@ def update_workspace(
         created_at=existing_workspace.created_at,
         updated_at=existing_workspace.updated_at,
         created_by=existing_workspace.created_by,
-        members=members
+        members=members,
     )
 
 
@@ -181,6 +172,7 @@ def delete_workspace(
 
     return
 
+
 @workspace_router.post("/{workspace_id}/members", response_model=WorkspaceResponse)
 def add_workspace_member(
     workspace_id: int,
@@ -194,29 +186,26 @@ def add_workspace_member(
 
     # Try to find existing user by email
     user_to_add = session.exec(select(User).where(User.email == member.email)).first()
-    
+
     if not user_to_add:
         # User doesn't exist yet - store email for invitation
         # For now, we'll reject until they sign up
         raise HTTPException(
-            status_code=404, 
-            detail="User not found. They need to sign up first before being added to a workspace."
+            status_code=404,
+            detail="User not found. They need to sign up first before being added to a workspace.",
         )
 
     # Check if user is already a member
     existing_member = session.exec(
         select(WorkspaceMember).where(
-            WorkspaceMember.workspace_id == workspace_id,
-            WorkspaceMember.user_id == user_to_add.id
+            WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == user_to_add.id
         )
     ).first()
     if existing_member:
         raise HTTPException(status_code=400, detail="User is already a member")
 
     workspace_member = WorkspaceMember(
-        workspace_id=workspace_id,
-        user_id=user_to_add.id,
-        role=member.role
+        workspace_id=workspace_id, user_id=user_to_add.id, role=member.role
     )
     session.add(workspace_member)
     session.commit()
@@ -228,7 +217,7 @@ def add_workspace_member(
             email=m.user.email,
             name=m.user.full_name,
             picture=m.user.google_picture,
-            role=m.role
+            role=m.role,
         )
         for m in existing_workspace.members
     ]
@@ -240,5 +229,5 @@ def add_workspace_member(
         created_at=existing_workspace.created_at,
         updated_at=existing_workspace.updated_at,
         created_by=existing_workspace.created_by,
-        members=members
+        members=members,
     )

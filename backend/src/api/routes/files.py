@@ -30,8 +30,7 @@ def get_workspace_files(
     # Check if user is a member
     is_member = session.exec(
         select(WorkspaceMember).where(
-            WorkspaceMember.workspace_id == workspace_id,
-            WorkspaceMember.user_id == current_user.id
+            WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == current_user.id
         )
     ).first()
 
@@ -39,20 +38,18 @@ def get_workspace_files(
         raise HTTPException(status_code=403, detail="Access denied")
 
     # Get files for this workspace
-    files = session.exec(
-        select(File).where(File.workspace_id == workspace_id)
-    ).all()
+    files = session.exec(select(File).where(File.workspace_id == workspace_id)).all()
 
     return files
 
 
 @files_router.post("/import/google-drive", response_model=FileResponse)
 async def import_from_google_drive(
-        workspace_id: int,
-        file: UploadFile = UploadFile(...),
-        google_drive_id: None | str = Form(None),
-        current_user: User = Depends(get_current_user),
-        session: Session = Depends(get_session),
+    workspace_id: int,
+    file: UploadFile = UploadFile(...),
+    google_drive_id: None | str = Form(None),
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
 ):
     """Import a file from Google Drive to a workspace"""
     workspace = session.get(Workspace, workspace_id)
@@ -61,8 +58,7 @@ async def import_from_google_drive(
 
     is_member = session.exec(
         select(WorkspaceMember).where(
-            WorkspaceMember.workspace_id == workspace_id,
-            WorkspaceMember.user_id == current_user.id
+            WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == current_user.id
         )
     ).first()
 
@@ -83,15 +79,11 @@ async def import_from_google_drive(
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to save file: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
     finally:
         file.file.close()
 
     file_size = file_path.stat().st_size
-
 
     db_file = File(
         name=file.filename or "unknown",
@@ -112,10 +104,10 @@ async def import_from_google_drive(
 
 @files_router.delete("/{file_id}", status_code=204)
 def delete_file(
-        workspace_id: int,
-        file_id: int,
-        current_user: User = Depends(get_current_user),
-        session: Session = Depends(get_session),
+    workspace_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
 ):
     """Delete a file from a workspace"""
 
@@ -125,8 +117,7 @@ def delete_file(
 
     is_member = session.exec(
         select(WorkspaceMember).where(
-            WorkspaceMember.workspace_id == workspace_id,
-            WorkspaceMember.user_id == current_user.id
+            WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == current_user.id
         )
     ).first()
 
@@ -155,10 +146,10 @@ def delete_file(
 
 @files_router.get("/{file_id}/download")
 def download_file(
-        workspace_id: int,
-        file_id: int,
-        current_user: User = Depends(get_current_user),
-        session: Session = Depends(get_session),
+    workspace_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
 ):
     """Download a file from a workspace"""
 
@@ -168,8 +159,7 @@ def download_file(
 
     is_member = session.exec(
         select(WorkspaceMember).where(
-            WorkspaceMember.workspace_id == workspace_id,
-            WorkspaceMember.user_id == current_user.id
+            WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == current_user.id
         )
     ).first()
 
@@ -192,4 +182,3 @@ def download_file(
         filename=db_file.name,
         media_type=db_file.mime_type or "application/octet-stream",
     )
-

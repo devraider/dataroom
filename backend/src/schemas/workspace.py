@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -9,10 +8,11 @@ from backend.src.types.roles import RoleEnum
 
 class WorkspaceMemberResponse(BaseModel):
     """Schema for workspace member in response"""
+
     id: int
     email: str
     name: str
-    picture: Optional[str]
+    picture: str | None
     role: RoleEnum
 
 
@@ -21,7 +21,7 @@ class WorkspaceResponse(BaseSchema):
 
     id: int
     name: str
-    description: Optional[str]
+    description: str | None
     created_at: datetime
     updated_at: datetime
     created_by: int
@@ -32,7 +32,8 @@ class WorkspaceCreate(BaseModel):
     """Schema for creating a new workspace"""
 
     name: str
-    description: Optional[str] = None
+    description: str | None = None
+
 
 class WorkspaceAddMember(BaseModel):
     """Schema for adding a member to a workspace"""

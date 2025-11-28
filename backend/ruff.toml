@@ -14,7 +14,13 @@ select = [
 ]
 ignore = [
     "E501",  # line too long (handled by formatter)
+    "B008",  # function call in argument defaults (FastAPI Depends pattern)
+    "B904",  # raise from exception (opinionated)
 ]
+
+[lint.isort]
+known-first-party = ["backend"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
 [format]
 quote-style = "double"

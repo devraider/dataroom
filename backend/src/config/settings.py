@@ -29,5 +29,6 @@ class AppSettings(BaseSettings):
     ALLOWED_ORIGINS: list[str] = ["*"]
     STORAGE_BASE_PATH: Path = Path(__file__).parent.parent / "storage"
 
+
 database_settings = DatabaseSettings()
 app_settings = AppSettings()

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -13,41 +13,42 @@ if TYPE_CHECKING:
 
 class WorkspaceBase(SQLModel):
     """Base workspace model"""
+
     name: str = Field(max_length=255)
-    description: Optional[str] = Field(default=None, max_length=1000)
+    description: str | None = Field(default=None, max_length=1000)
 
 
 class Workspace(WorkspaceBase, table=True):
     """Workspace database model"""
+
     __tablename__ = "workspaces"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     created_at: datetime = Field(default_factory=utc_now)
     updated_at: datetime = Field(default_factory=utc_now)
     created_by: int = Field(foreign_key="users.id")
 
     # Relationships
     members: list["WorkspaceMember"] = Relationship(
-        back_populates="workspace",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="workspace", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
     files: list["File"] = Relationship(
-        back_populates="workspace",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="workspace", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
-
 
 
 class WorkspaceMemberBase(SQLModel):
     """Base workspace member model"""
+
     role: RoleEnum = Field(default=RoleEnum.USER)
 
 
 class WorkspaceMember(WorkspaceMemberBase, table=True):
     """Workspace member database model (junction table)"""
+
     __tablename__ = "workspace_members"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
     workspace_id: int = Field(foreign_key="workspaces.id")
     created_at: datetime = Field(default_factory=utc_now)
