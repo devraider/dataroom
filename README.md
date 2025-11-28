@@ -1,9 +1,9 @@
-# Data Room
+# Data Room 🔐 📁
 
 Full-stack secure data room application designed for enterprise file management, workspace collaboration, and controlled document sharing.
 Data Room provides organizations a robust platform to securely store, organize, and share sensitive documents with granular access controls and role-based permissions.
 
-## Tech Stack
+## Tech Stack 💿
 
 ### 1. Backend
 
