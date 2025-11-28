@@ -102,9 +102,7 @@ async def test_google_login_success_existing_user(
     assert data["user"]["email"] == "existing@example.com"
 
 
-async def test_google_login_invalid_token(
-    mock_httpx_client, client: TestClient
-) -> None:
+async def test_google_login_invalid_token(mock_httpx_client, client: TestClient) -> None:
     """Test login with invalid Google token."""
     _, mock_response = mock_httpx_client
 
@@ -120,9 +118,7 @@ async def test_google_login_invalid_token(
     assert "Invalid Google token" in response.json()["detail"]
 
 
-async def test_get_me_success(
-    mock_httpx_client, client: TestClient, session: Session
-) -> None:
+async def test_get_me_success(mock_httpx_client, client: TestClient, session: Session) -> None:
     """Test successfully getting current user info."""
     _, mock_response = mock_httpx_client
 
@@ -159,9 +155,7 @@ def test_get_me_unauthorized(client: TestClient) -> None:
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_logout_success(
-    mock_httpx_client, client: TestClient, session: Session
-) -> None:
+async def test_logout_success(mock_httpx_client, client: TestClient, session: Session) -> None:
     """Test successful logout."""
     _, mock_response = mock_httpx_client
 
@@ -188,9 +182,7 @@ async def test_logout_success(
 
     assert response.status_code == status.HTTP_200_OK
 
-    blacklisted = session.exec(
-        select(TokenBlacklist).where(TokenBlacklist.token == token)
-    ).first()
+    blacklisted = session.exec(select(TokenBlacklist).where(TokenBlacklist.token == token)).first()
     assert blacklisted is not None
 
 
