@@ -67,13 +67,15 @@ export function FileViewer({
 
   useEffect(() => {
     fetchFile();
+  }, [fetchFile]);
 
+  useEffect(() => {
     return () => {
       if (blobUrl) {
         window.URL.revokeObjectURL(blobUrl);
       }
     };
-  }, [fetchFile, blobUrl]);
+  }, [blobUrl]);
 
   useEffect(() => {
     if (!isPdf || numPages <= 1) return;
