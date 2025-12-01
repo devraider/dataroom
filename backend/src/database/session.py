@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 from sqlmodel import Session, SQLModel, create_engine
 
@@ -12,15 +12,16 @@ engine = create_engine(
     max_overflow=10,
 )
 
+
 def create_db_and_tables() -> None:
-    """ Create database and tables
+    """Create database and tables
     Returns:
         None: Create database and tables
     """
     SQLModel.metadata.create_all(engine)
 
 
-def get_session() -> Generator[Session, None, None]:
+def get_session() -> Generator[Session]:
     """Create a new database session
     Context manager that yields a SQLModel Session object.
     Yields:

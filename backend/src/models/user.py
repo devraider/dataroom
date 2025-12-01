@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -11,19 +11,21 @@ if TYPE_CHECKING:
 
 class UserBase(SQLModel):
     """Base user model"""
+
     email: str = Field(unique=True, index=True, max_length=255)
     full_name: str = Field(max_length=255)
 
 
 class User(UserBase, table=True):
     """User database model"""
+
     __tablename__ = "users"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     created_at: dt.datetime = Field(default_factory=utc_now)
     updated_at: dt.datetime = Field(default_factory=utc_now)
     google_user_id: str = Field(unique=True, index=True, max_length=255)
-    google_picture: Optional[str] = Field(default=None, max_length=1024)
+    google_picture: str | None = Field(default=None, max_length=1024)
 
     # Relationships
     workspaces: list["WorkspaceMember"] = Relationship(back_populates="user")

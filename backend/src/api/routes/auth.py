@@ -9,8 +9,8 @@ from sqlmodel import Session, select
 from backend.src.api.auth.security import get_current_user
 from backend.src.config.settings import app_settings
 from backend.src.database.session import get_session
-from backend.src.models.user import User
 from backend.src.models.token_blacklist import TokenBlacklist
+from backend.src.models.user import User
 from backend.src.schemas.auth import (
     GoogleLoginRequest,
     GoogleLoginResponse,
@@ -31,11 +31,11 @@ async def google_login(
 ):
     """Login with Google OAuth
     Verifies Google ID token, creates/finds user, and returns JWT access token.
-    
+
     Args:
         request: Google login request with JWT credential
         session: Database session
-        
+
     Returns:
         TokenResponse: Access token and user info
     """
@@ -47,13 +47,13 @@ async def google_login(
                 params={"id_token": request.credential},
                 timeout=10.0,
             )
-            
+
             if response.status_code != 200:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid Google token",
                 )
-            
+
             token_info = response.json()
 
         google_login_response = GoogleLoginResponse.model_validate(token_info)
@@ -71,18 +71,18 @@ async def google_login(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email not verified",
             )
-        
+
         if not google_login_response.email:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email not provided",
             )
-        
+
         # Find or create user
         user = session.exec(
             select(User).where(User.google_user_id == google_login_response.user_id)
         ).first()
-        
+
         if not user:
             user = User(
                 email=google_login_response.email,
@@ -93,29 +93,29 @@ async def google_login(
             session.add(user)
             session.commit()
             session.refresh(user)
-        
+
         # Generate JWT token
         token_data = {
             "sub": str(user.id),
             "email": user.email,
             "exp": utc_now() + timedelta(minutes=app_settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         }
-        
+
         access_token = jwt.encode(
-            token_data,
-            app_settings.SECRET_KEY.get_secret_value(),
-            algorithm=app_settings.ALGORITHM
+            token_data, app_settings.SECRET_KEY.get_secret_value(), algorithm=app_settings.ALGORITHM
         )
-        
+
         return TokenResponse(
             token=access_token,
-            user=UserResponse(id=user.id,
-                              email=user.email, name=user.full_name,
-                              picture=user.google_picture,
-                              role=RoleEnum.ADMIN
-                              )
+            user=UserResponse(
+                id=user.id,
+                email=user.email,
+                name=user.full_name,
+                picture=user.google_picture,
+                role=RoleEnum.ADMIN,
+            ),
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -128,10 +128,10 @@ async def google_login(
 @auth_router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)) -> User:
     """Get current authenticated user
-    
+
     Args:
         current_user: Current authenticated user from JWT
-        
+
     Returns:
         dict: User information
     """
@@ -145,39 +145,38 @@ async def logout(
     session: Session = Depends(get_session),
 ) -> None:
     """Logout user by blacklisting their current token
-    
+
     Args:
         credentials: HTTP Authorization credentials with Bearer token
         current_user: Current authenticated user
         session: Database session
-        
+
     Returns:
         None
     """
     token = credentials.credentials
-    
+
     # Decode token to get expiration time
     try:
         payload = jwt.decode(
-            token,
-            app_settings.SECRET_KEY.get_secret_value(),
-            algorithms=[app_settings.ALGORITHM]
+            token, app_settings.SECRET_KEY.get_secret_value(), algorithms=[app_settings.ALGORITHM]
         )
         exp_timestamp = payload.get("exp")
-        
+
         if exp_timestamp:
             import datetime as dt
-            expires_at = dt.datetime.fromtimestamp(exp_timestamp, tz=dt.timezone.utc)
+
+            expires_at = dt.datetime.fromtimestamp(exp_timestamp, tz=dt.UTC)
         else:
             # Default to current time + token expiry if exp not in token
             expires_at = utc_now() + timedelta(minutes=app_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-            
+
     except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
-    
+
     # Add token to blacklist
     blacklisted_token = TokenBlacklist(
         token=token,
@@ -186,5 +185,5 @@ async def logout(
     )
     session.add(blacklisted_token)
     session.commit()
-    
+
     return None
